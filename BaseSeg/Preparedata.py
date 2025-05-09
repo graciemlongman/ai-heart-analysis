@@ -8,15 +8,6 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 from Preprocess import preprocess_inplace
 
-
-# currently working on finishing getting the seg dataset ready
-# since the ruddy LCA/RCA classifier was shit
-# my work round is to just manually split the images into two datasets based on their L/R label (ffs)
-# but my label store is not working rn, so everything is just getting moved into the RCA dataset.
-# fix! and then you can have a go at actually training a model 
-# live laugh love
-
-
 def load_annotations(dataset_dir):
     if dataset_dir is None:
         raise ValueError("No Data")
@@ -52,6 +43,15 @@ def classify_l_r(file_store):
                 continue
     return label_store
 
+def write_yaml(dataset_new_path):
+    with open(f'{dataset_new_path}/data.yaml', 'w', encoding='utf-8') as file:
+        file.write(f"""train: {dataset_new_path}/images/train
+val: {dataset_new_path}/images/val
+nc: 25
+names: [1, 2, 3, 4, 5, 6, 7, 8, 9, "9a", 10, "10a", 11, 12, "12a", "12b", 13, 14, "14a", "14b", 15, 16, "16a", "16b", "16c"]
+""")
+
+
 def seg_prepare_data(dataset_dir='arcade/syntax/'):
     
     file_store = load_annotations(dataset_dir)
@@ -65,6 +65,7 @@ def seg_prepare_data(dataset_dir='arcade/syntax/'):
     for dataset_new in ['BaseSeg/syntaxLCA', 'BaseSeg/syntaxRCA']:
         if os.path.exists(dataset_new)==False:
             os.makedirs(dataset_new)
+            write_yaml(dataset_new)
             for type in ['images', 'labels']:
                 os.makedirs(f'{dataset_new}/{type}')
                 for split in ['train', 'test','val']:
@@ -99,9 +100,11 @@ def seg_prepare_data(dataset_dir='arcade/syntax/'):
             if label_store[split, int(img_id[:-4])][0] == 'LCA':
                 dst = f'{dataset_newL}/images/{split}/'
                 copy_image(src,dst)
+                preprocess_inplace(f'{dst}{img_id}')
             else:
                 dst = f'{dataset_newR}/images/{split}/'
                 copy_image(src,dst)
+                preprocess_inplace(f'{dst}{img_id}')
 
         
 
