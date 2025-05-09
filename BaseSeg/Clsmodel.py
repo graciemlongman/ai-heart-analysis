@@ -2,14 +2,14 @@ from ultralytics import YOLO
 import os
 from Preparedata import cls_prepare_data
 
-# class ClsModel:
-#     def __init__(self, data_dir, model_save_dir):
-#         self.model = YOLO("yolov8x-cls.pt")
-#         self.dataset_dir = data_dir
-#         self.model_save_dir = model_save_dir
+class ClsModel:
+    def __init__(self, data_dir, model_save_dir):
+        self.model = YOLO("yolov8x-cls.pt")
+        self.dataset_dir = data_dir
+        self.model_save_dir = model_save_dir
 
-#     def train_model(self, ):
-#         data = cls_prepare_data(self.dataset_dir)
+    def train_model(self, ):
+        data = cls_prepare_data(self.dataset_dir)
 
 #         #includes default augmentations in pipeline
 #         results = self.model.train(data=data, imgsz=512, device=0, 
@@ -38,3 +38,5 @@ from Preparedata import cls_prepare_data
 #early stopping yes
 #patience yes
 #dropout yes
+if __name__ == '__main__':
+    ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/')
