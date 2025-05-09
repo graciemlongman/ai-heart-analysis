@@ -1,12 +1,16 @@
 from skimage import exposure, util, morphology
 from skimage.color import rgb2gray
-import cv2 as cv
+import cv2
 import numpy as np 
 
 def preprocess(img):
 
+    if isinstance(img,str):
+        img=np.array(cv2.imread(img))
+
     image = img.astype(np.float32) / 255.0 
-    image = rgb2gray(image)
+    if image.ndim == 3 and image.shape[2] == 3:
+        image = rgb2gray(image)
     
     # First, contrast limited adaptive histogram equalisation (CLAHE)
     clahe_image = exposure.equalize_adapthist(image)

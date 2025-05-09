@@ -49,8 +49,8 @@ def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/syntax1'
     for (split, image_id), labels in label_store.items():
         label = labels[0]
         if label in ['LCA', 'RCA']:
-            src = os.path.join(dataset_new, f'/{split}/images/{image_id}.png')
-            dst = os.path.join(dataset_new, f'/{split}/{label}/{image_id}.png')
+            src = f'{dataset_dir}/{split}/images/{image_id}.png'
+            dst = f'{dataset_new}/{split}/{label}/'
             if os.path.exists(src):
                 shutil.copy(src, dst)
 

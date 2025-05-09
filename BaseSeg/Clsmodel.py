@@ -8,19 +8,20 @@ class ClsModel:
         self.dataset_dir = data_dir
         self.model_save_dir = model_save_dir
 
-    def train_model(self, ):
-        data = cls_prepare_data(self.dataset_dir)
+    def train_model(self,path,name, prepare_data=False):
+        if prepare_data==True:    
+            cls_prepare_data(self.dataset_dir)
 
-#         #includes default augmentations in pipeline
-#         results = self.model.train(data=data, imgsz=512, device=0, 
-#                             epochs=400, batch=16, cos_lr=True,
-#                             patience=50, dropout=0.5, val=True,
-#                             project=self.model_save_dir, name='cad_cls')
+        #includes default augmentations in pipeline
+        self.model.train(data=path, imgsz=512, device=0, 
+                            epochs=400, batch=16, cos_lr=True,
+                            patience=50, dropout=0.5, val=True,
+                            project=self.model_save_dir, name=name)
 
-#         best_model_path = os.path.join(self.model_save_dir, 'cad_cls', 'weights', 'best.pt')
-#         print(f"Best model saved at: {best_model_path}")
+        best_model_path = os.path.join(self.model_save_dir, name, 'weights', 'best.pt')
+        print(f"Best model saved at: {best_model_path}")
         
-#         return best_model_path
+        return best_model_path
     
 #     def eval_model(self, best_model_path):
 
@@ -39,4 +40,4 @@ class ClsModel:
 #patience yes
 #dropout yes
 if __name__ == '__main__':
-    ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/')
+    ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/').train_model(path='BaseSeg/syntax1', name='no_pp')
