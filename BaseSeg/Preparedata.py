@@ -4,7 +4,7 @@ import shutil
 from collections import defaultdict
 import sys 
 sys.path.append(os.path.expanduser('~/PROJECT/'))
-from Preprocess import preprocess
+from Preprocess import preprocess_inplace
 
 def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/syntax1'):
     if dataset_dir is None:
@@ -53,6 +53,7 @@ def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/syntax1'
             dst = f'{dataset_new}/{split}/{label}/'
             if os.path.exists(src):
                 shutil.copy(src, dst)
+                preprocess_inplace(f'{dst}{image_id}.png')
 
 if __name__ == '__main__':
     cls_prepare_data()

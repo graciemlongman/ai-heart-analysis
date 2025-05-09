@@ -23,13 +23,13 @@ class ClsModel:
         
         return best_model_path
     
-#     def eval_model(self, best_model_path):
+    def eval_model(self, best_model_path):
 
-#         model=YOLO(best_model_path)
-#         results=model.val(data=test_dir)
+        model=YOLO(best_model_path)
+        results=model.val(data=test_dir)
 
-#         print(f'Test results:{results}')
-#         return results
+        print(f'Test results:{results}')
+        return results
 
 
 #dynamically adjust learning rate - not speced - default? use cos_lr for now?
@@ -39,5 +39,7 @@ class ClsModel:
 #early stopping yes
 #patience yes
 #dropout yes
+
 if __name__ == '__main__':
-    ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/').train_model(path='BaseSeg/syntax1', name='no_pp')
+    best_model_path = ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/').train_model(path='BaseSeg/syntax1', name='no_pp', prepare_data=False)
+    ClsModel.eval_model(best_model_path='')
