@@ -1,6 +1,5 @@
 from ultralytics import YOLO
 import torch
-from torch.optim.lr_scheduler import PolynomialLR
 import os
 
 # prepare data
@@ -17,9 +16,6 @@ class SegModel:
     def train_model(self, data, model_version):
         
         patience = 250 if model_version=='LCA' else 200
-        
-        optimizer = torch.optim.AdamW()
-        scheduler = PolynomialLR(optimizer)
 
         #prepare data
         #use coco to yolo for annotations
