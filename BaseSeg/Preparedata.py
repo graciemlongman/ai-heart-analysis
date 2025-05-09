@@ -2,9 +2,11 @@ import os
 import json
 import shutil
 from collections import defaultdict
-#from Preprocess import preprocess
+import sys 
+sys.path.append(os.path.expanduser('~/PROJECT/'))
+from Preprocess import preprocess
 
-def cls_prepare_data(dataset_dir='arcade/syntax/'):
+def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/syntax1'):
     if dataset_dir is None:
         raise ValueError("No Data")
     
@@ -34,23 +36,23 @@ def cls_prepare_data(dataset_dir='arcade/syntax/'):
                 prev=image_id
                 continue
     print(len(label_store))
-            
-    #make directory for train/val
+    
+    #make dataset directories
+    if os.path.exists(dataset_new)==False:
+        os.makedirs(dataset_new)
     for split in ['train', 'test','val']:
         for classi in ['LCA', 'RCA']:
-            if os.path.exists(dataset_dir+f'{split}/{classi}/') == False:
-                os.makedirs(dataset_dir+f'{split}/{classi}/')
-                for folder,img in label_store:
-                    print(label_store[folder,img][0])
-                    print(classi)
+            if os.path.exists(dataset_new+f'/{split}/{classi}/') == False:
+                os.makedirs(dataset_new+f'/{split}/{classi}/')
     
-                    if label_store[folder,img][0]==classi:
-                        img_path = dataset_dir+f'{folder}/images/{img}.png'
-                        #copy images in class to folder
-                        shutil.copy(img_path,dataset_dir+f'{split}/{classi}/')
+    #copy images into appropriate folder
+    for (split, image_id), labels in label_store.items():
+        label = labels[0]
+        if label in ['LCA', 'RCA']:
+            src = os.path.join(dataset_new, f'/{split}/images/{image_id}.png')
+            dst = os.path.join(dataset_new, f'/{split}/{label}/{image_id}.png')
+            if os.path.exists(src):
+                shutil.copy(src, dst)
 
-    # preprocess all the images as well LAD
-
-
-# if __name__ == '__main__':
-#     cls_prepare_data()
+if __name__ == '__main__':
+    cls_prepare_data()
