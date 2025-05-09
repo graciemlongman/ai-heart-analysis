@@ -1,5 +1,7 @@
 arcade/
 BaseSeg/syntax1/
+BaseSeg/syntaxLCA
+BaseSeg/syntaxRCA
 __pycache__/
 yolov8x-cls.pt
 yolo11n.pt
