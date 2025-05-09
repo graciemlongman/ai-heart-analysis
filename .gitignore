@@ -1,0 +1,5 @@
+arcade/
+BaseSeg/syntax1/
+__pycache__/
+yolov8x-cls.pt
+yolo11n.pt
