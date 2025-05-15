@@ -2,14 +2,9 @@ from ultralytics import YOLO
 import os
 from Preparedata import seg_prepare_data
 
-# prepare data
-# polynomial learning rate scheduler?
-# segment LCA and RCA separately, then ensemble results
-
 class SegModel:
     def __init__(self, model_version, data_dir, model_save_dir):
-        self.yolo_model=YOLO("yolov8x-seg.pt")
-        self.model = self.yolo_model.model
+        self.model=YOLO("yolov8x-seg.pt")
         self.model_version = model_version #ie LCA/RCA
         self.dataset_dir = data_dir
         self.model_save_dir = model_save_dir
@@ -17,7 +12,7 @@ class SegModel:
     def train_model(self, path, name, prepare_data=False):
 
         if prepare_data == True:
-            seg_prepare_data(self.dataset_dir)
+            seg_prepare_data(self.dataset_dir, preprocess=True)
         
         patience = 250 if self.model_version=='LCA' else 200
 
@@ -42,8 +37,20 @@ class SegModel:
         return 
     
 if __name__=='__main__':
-    modelLCA=SegModel('LCA', data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/seg/')
-    lca_best_path = modelLCA.train_model('syntaxLCA/data.yaml', name='first', prepare_data=False)
+    modelLCA=SegModel('LCA', data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/segL/')
+    modelRCA=SegModel('RCA', data_dir='arcade/syntax', model_save_dir='BaseSeg/models/segR')
+
+    # modelLCA.train_model(path='BaseSeg/syntaxLCA/data.yaml', name='first', prepare_data=False)
+    # modelRCA.train_model(path='BaseSeg/syntaxRCA/data.yaml', name='first', prepare_data=False)
+
+    lca_best_path = 'BaseSeg/models/segL/first/weights/best.pt'
+    rca_best_path = 'BaseSeg/models/segR/first/weights/best.pt'
+
+    best_LCAmodel = YOLO(lca_best_path)
+    best_RCAmodel = YOLO(rca_best_path)
+
+    #LCAresults = best_LCAmodel('BaseSeg/syntaxLCA/images/test', save=True, project='BaseSeg/runs/segment/predict', name='LCApred')
+    #RCAresults = best_RCAmodel('BaseSeg/syntaxRCA/images/test', save=True, project='BaseSeg/runs/segment/predict', name='RCApred')
 
 
     

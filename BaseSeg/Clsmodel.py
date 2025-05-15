@@ -10,7 +10,7 @@ class ClsModel:
 
     def train_model(self,path,name, prepare_data=False):
         if prepare_data==True:    
-            cls_prepare_data(self.dataset_dir)
+            cls_prepare_data(preprocess=True)
 
         #includes default augmentations in pipeline
         self.model.train(data=path, imgsz=512, device=0, 
@@ -33,5 +33,6 @@ class ClsModel:
 
 if __name__ == '__main__':
     model = ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/')
-    best_model_path = model.train_model(path='BaseSeg/syntax1', name='no_pp', prepare_data=False)
-    results = model.eval_model(best_model_path='BaseSeg/models/cls/pp/weights/best.pt', name='pp')
+    #model.train_model(path='BaseSeg/syntax1', name='first', prepare_data=True)
+    best_model = YOLO('BaseSeg/models/cls/firsttrain/weights/best.pt')
+    results = best_model('BaseSeg/syntax1/test/', save=True, project='BaseSeg/runs/classify/predict/', name='cls')
