@@ -35,4 +35,4 @@ if __name__ == '__main__':
     model = ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/')
     #model.train_model(path='BaseSeg/syntax1', name='first', prepare_data=True)
     best_model = YOLO('BaseSeg/models/cls/firsttrain/weights/best.pt')
-    results = best_model('BaseSeg/syntax1/test/', save=True, project='BaseSeg/runs/classify/predict/', name='cls')
+    results = best_model('BaseSeg/syntax1/test/ens', save=True, project='BaseSeg/runs/classify/predict/', name='cls')
