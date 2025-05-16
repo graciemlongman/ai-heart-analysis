@@ -4,8 +4,6 @@ import shutil
 import numpy as np
 from collections import defaultdict
 import sys 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
 from Preprocess import preprocess_inplace
 
 def load_annotations(dataset_dir):
