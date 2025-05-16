@@ -69,7 +69,7 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
     dataset_newR='BaseSeg/syntaxRCA'
     
     #make dataset directories
-    for dataset_new in ['BaseSeg/syntaxLCA', 'BaseSeg/syntaxRCA']:
+    for dataset_new in ['BaseSeg/datasets/syntaxLCA', 'BaseSeg/datsets/syntaxRCA']:
         if os.path.exists(dataset_new)==False:
             os.makedirs(dataset_new)
             write_yaml(dataset_new, denom=str(dataset_new[-3:]))
@@ -104,7 +104,6 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
 
         #copy images into correct file structures
         for img_id, filename in name_cls.items():
-            print('image_______slay',img_id)
             src = f'{dataset_dir}{split}/images/{filename}'
             if label_store[split, img_id][0] == 'LCA':
                 dst = f'{dataset_newL}/images/{split}/'
@@ -119,7 +118,7 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
 
         
 
-def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/syntax1', preprocess=False):
+def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/datasets/syntax1', preprocess=False):
 
     file_store = load_annotations(dataset_dir)
 

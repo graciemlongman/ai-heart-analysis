@@ -26,13 +26,13 @@ class ClsModel:
     def eval_model(self, best_model_path, name):
 
         model=YOLO(best_model_path)
-        results=model.val(data='BaseSeg/syntax1/test', project=self.model_save_dir, name=name+'val')
+        results=model.val(data='BaseSeg/datasets/syntax1/test', project=self.model_save_dir, name=name+'val')
 
         print(f'Test results:{results}')
         return results
 
 if __name__ == '__main__':
     model = ClsModel(data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/cls/')
-    #model.train_model(path='BaseSeg/syntax1', name='first', prepare_data=True)
+    #model.train_model(path='BaseSeg/datasets/syntax1', name='first', prepare_data=True)
     best_model = YOLO('BaseSeg/models/cls/firsttrain/weights/best.pt')
-    results = best_model('BaseSeg/syntax1/test/ens', save=True, project='BaseSeg/runs/classify/predict/', name='cls')
+    results = best_model('BaseSeg/datasets/syntax1/test/ens', save=True, project='BaseSeg/runs/classify/predict/', name='cls')

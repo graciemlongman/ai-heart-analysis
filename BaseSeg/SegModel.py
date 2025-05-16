@@ -28,20 +28,18 @@ class SegModel:
     
     def eval_model(self, name, best_model_path):
         model=YOLO(best_model_path)
-        results=model.val(data='BaseSeg/syntax1/test', project=self.model_save_dir, name=name+'val')
+        results=model.val(data='BaseSeg/datasets/syntax1/test', project=self.model_save_dir, name=name+'val')
 
         print(f'Test results:{results}')
         return results
-    
-    def ensemble(self):
-        return 
+
     
 if __name__=='__main__':
     modelLCA=SegModel('LCA', data_dir='arcade/syntax/', model_save_dir='BaseSeg/models/segL/')
     modelRCA=SegModel('RCA', data_dir='arcade/syntax', model_save_dir='BaseSeg/models/segR')
 
-    # modelLCA.train_model(path='BaseSeg/syntaxLCA/data.yaml', name='first', prepare_data=False)
-    # modelRCA.train_model(path='BaseSeg/syntaxRCA/data.yaml', name='first', prepare_data=False)
+    # modelLCA.train_model(path='BaseSeg/datasets/syntaxLCA/data.yaml', name='first', prepare_data=False)
+    # modelRCA.train_model(path='BaseSeg/datasets/syntaxRCA/data.yaml', name='first', prepare_data=False)
 
     lca_best_path = 'BaseSeg/models/segL/first/weights/best.pt'
     rca_best_path = 'BaseSeg/models/segR/first/weights/best.pt'
@@ -49,8 +47,8 @@ if __name__=='__main__':
     best_LCAmodel = YOLO(lca_best_path)
     best_RCAmodel = YOLO(rca_best_path)
 
-    #LCAresults = best_LCAmodel('BaseSeg/syntaxLCA/images/test', save=True, project='BaseSeg/runs/segment/predict', name='LCApred')
-    #RCAresults = best_RCAmodel('BaseSeg/syntaxRCA/images/test', save=True, project='BaseSeg/runs/segment/predict', name='RCApred')
+    #LCAresults = best_LCAmodel('BaseSeg/datasets/syntaxLCA/images/test', save=True, project='BaseSeg/runs/segment/predict', name='LCApred')
+    #RCAresults = best_RCAmodel('BaseSeg/datasets/syntaxRCA/images/test', save=True, project='BaseSeg/runs/segment/predict', name='RCApred')
 
 
     
