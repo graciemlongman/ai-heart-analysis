@@ -40,21 +40,20 @@ def classify_l_r(file_store):
     return label_store
 
 def write_yaml(dataset_new_path, denom):
-    home_path='/home/lunet/nc0051/PROJECT/ai-heart-analysis'
-    if denom=='LCA':
-        with open(f'{dataset_new_path}/data.yaml', 'w', encoding='utf-8') as file:
-            file.write(f"""train: {home_path}/{dataset_new_path}/images/train
-val: {home_path}/{dataset_new_path}/images/val
-nc: 17
-names: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 24, 25]
-""")
+    home_path = '/home/lunet/nc0051/PROJECT/ai-heart-analysis'
+    
+    if denom == 'LCA':
+        class_names = ['5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '24', '25']
     else:
-        with open(f'{dataset_new_path}/data.yaml', 'w', encoding='utf-8') as file:
-            file.write(f"""train: {home_path}/{dataset_new_path}/images/train
-val: {home_path}/{dataset_new_path}/images/val
-nc: 8
-names: [1, 2, 3, 4, 20, 21, 22, 23]
-""")
+        class_names = ['1', '2', '3', '4', '20', '21', '22', '23']
+    
+    with open(f'{dataset_new_path}/data.yaml', 'w', encoding='utf-8') as file:
+        file.write(f"train: {home_path}/{dataset_new_path}/images/train\n")
+        file.write(f"val: {home_path}/{dataset_new_path}/images/val\n")
+        file.write(f"nc: {len(class_names)}\n")
+        file.write("names:\n")
+        for idx, name in enumerate(class_names):
+            file.write(f"  {idx}: '{name}'\n")
 
 
 def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
@@ -63,8 +62,11 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
     label_store = classify_l_r(file_store)
     print(label_store['train',922][0]=='LCA')
     
-    dataset_newL= 'BaseSeg/syntaxLCA'
-    dataset_newR='BaseSeg/syntaxRCA'
+    dataset_newL= 'BaseSeg/datasets/syntaxLCA'
+    dataset_newR='BaseSeg/datasets/syntaxRCA'
+
+    id_map_lca = {1:0, 2:1, 3:2, 4:3, 20:4, 21:5, 22:6, 23:7}
+    id_map_rca = {5:0, 6:1, 7:2, 8:3, 9:4, 10:5, 11:6, 12:7, 13:8, 14:9, 15:10, 16:11, 17:12, 18:13, 19:14, 24:15, 25:16}
     
     #make dataset directories
     for dataset_new in ['BaseSeg/datasets/syntaxLCA', 'BaseSeg/datsets/syntaxRCA']:
@@ -85,18 +87,19 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
             annotation = np.array(ann["segmentation"][0])
             annotation[0::2] /= file["images"][ann["image_id"]-1]["width"]
             annotation[1::2] /= file["images"][ann["image_id"]-1]["height"]
-            name_anns[name_cls[ann["image_id"]]].append(str(ann["category_id"]) + " " + str(list(annotation)).replace("[", "").replace("]", "").replace(",", ""))
+            
+            cat_id_idx = id_map_lca[ann['category_id']] if ann['category_id'] in id_map_lca.keys() else id_map_rca[ann['category_id']]
+            name_anns[name_cls[ann["image_id"]]].append(str(cat_id_idx) + " " + str(list(annotation)).replace("[", "").replace("]", "").replace(",", ""))
         
         for k, v in name_anns.items():
             filename = os.path.splitext(k)[0]
             id = [key for key, val in name_cls.items() if val==k]
-            print(split, int(filename), id[0], v[0][0])
+            #print(split, int(filename), id[0], v[0][0])
             if label_store[str(split), id[0]][0] == 'LCA':
-                print('LCA')
-                with open(f"{f'{dataset_newL}/labels/{split}/{filename}.txt'}", "w", encoding="utf-8") as file:
+                with open(f'{dataset_newL}/labels/{split}/{filename}.txt', "w", encoding="utf-8") as file:
                     file.write("\n".join(v))
             else:
-                with open(f"{f'{dataset_newR}/labels/{split}/{filename}.txt'}", "w", encoding="utf-8") as file:
+                with open(f'{dataset_newR}/labels/{split}/{filename}.txt', "w", encoding="utf-8") as file:
                     file.write("\n".join(v))
         # end of adaption
 
@@ -148,5 +151,5 @@ def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/datasets
 if __name__ == '__main__':
     file_store=load_annotations(dataset_dir='arcade/syntax/')
     label_store = classify_l_r(file_store=file_store)
-    cls_prepare_data(preprocess=False)
+    # seg_prepare_data(preprocess=False)
 
