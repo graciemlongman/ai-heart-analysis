@@ -23,11 +23,12 @@ def get_points(json_file):
         store[ann["image_id"], ann["category_id"]].append(points)
     return store
 
-def get_masks(json_file, task):
+def get_masks(json_file, task, split):
+    num_imgs = 301 if split=='test' else 201 if split=='val' else 1001
     if task =='syntax':
-        masks = np.zeros((300, 26, 512, 512), dtype=np.uint8)  # Use uint8 for binary mask
+        masks = np.zeros((num_imgs, 26, 512, 512), dtype=np.uint8)  # Use uint8 for binary mask
     else:
-        masks = np.zeros((300, 512, 512), dtype=np.uint8)
+        masks = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
 
     for ann in json_file["annotations"]:
         points = np.array([ann["segmentation"][0][::2], ann["segmentation"][0][1::2]], dtype=np.int32).T
@@ -64,7 +65,7 @@ def plot_points(img_store, points_store, categories, name=False):
         plt.savefig(name)
 
 def plot_masks(filename, img_store, masks_store, task, name=False):
-    plt.figure(figsize=(20, 15))
+    plt.figure(figsize=(15, 10))
     for idx, ann in enumerate(filename["annotations"][:12]):
         ax = plt.subplot(3, 4, idx + 1)
         if task=='syntax':

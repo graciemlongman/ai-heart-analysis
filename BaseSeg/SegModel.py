@@ -39,7 +39,7 @@ if __name__=='__main__':
     modelRCA=SegModel('RCA', data_dir='arcade/syntax', model_save_dir='BaseSeg/models/segR')
 
     #modelLCA.train_model(path='BaseSeg/datasets/syntaxLCA/data.yaml', name='second', prepare_data=False)
-    modelRCA.train_model(path='BaseSeg/datasets/syntaxRCA/data.yaml', name='second', prepare_data=False)
+    #modelRCA.train_model(path='BaseSeg/datasets/syntaxRCA/data.yaml', name='second', prepare_data=False)
 
     lca_best_path = 'BaseSeg/models/segL/second/weights/best.pt'
     rca_best_path = 'BaseSeg/models/segR/second/weights/best.pt'
