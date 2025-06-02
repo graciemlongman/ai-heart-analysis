@@ -1,9 +1,16 @@
 arcade/
+
 BaseSeg/datasets/syntax1/
 BaseSeg/datasets/syntaxLCA
 BaseSeg/datasets/syntaxRCA
+
 StenUNet/
+
 __pycache__/
+
 yolov8x-cls.pt
 yolov8x-seg.pt
 yolo11n.pt
+
+stenExp/datasets
+stenExp/model_runs
