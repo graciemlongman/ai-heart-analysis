@@ -1,8 +1,6 @@
 arcade/
 
 BaseSeg/datasets/
-BaseSeg/models/
-BaseSeg/runs
 
 StenUNet/
 
