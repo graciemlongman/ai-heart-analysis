@@ -1,0 +1,20 @@
+name: project
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - scikit-learn
+  - opencv  # or opencv-python-headless (not both)
+  - ipykernel
+  - jupyterlab
+  - pip
+  - pip:
+      - keras
+      - albumentations
+      - einops
+      - absl-py
+      - nvidia-cudnn-cu12
