@@ -55,28 +55,6 @@ def load_annotations(dataset_dir):
             file_store[i]=anns 
     return file_store
 
-def create_dataset(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/'):
-    make_directories(path_new)
-    
-    for split in ['train', 'test', 'val']:
-        image_paths = sorted(glob(os.path.join(path,split,'images', '*.png')))
-        image_paths = sorted(image_paths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
-
-        dst_img=path_new+f'{split}/images/'
-        json_src = path+f'{split}/annotations/{split}.json'
-        json_dst=path_new+f'{split}/annotations/'
-        
-        for src_img in image_paths:
-            print('source',src_img)
-            print('dst', dst_img)
-            copy_file(src_img, dst_img)
-        copy_file(json_src, json_dst)
-
-        for i, mask in enumerate(annotation_to_mask(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
-            mask=(mask* 255).astype(np.uint8)
-            cv2.imwrite(os.path.join(json_dst,f'{i+1}.png'),mask)
-    return path_new
-
 def prepare_data_for_yolo(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/yolo_stenosis/', preprocess=False):
     file_store = load_annotations(path)
     make_directories(path_new, version='yolo')
@@ -112,8 +90,29 @@ def prepare_data_for_yolo(path='arcade/stenosis/', path_new='stenExp/datasets/ar
             if preprocess:
                 preprocess_inplace(f'{dst}{filename}')
 
+def create_dataset(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/'):
+    make_directories(path_new)
+    
+    for split in ['train', 'test', 'val']:
+        image_paths = sorted(glob(os.path.join(path,split,'images', '*.png')))
+        image_paths = sorted(image_paths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
 
-def preprocess(path='stenExp/datasets/arcade/stenosis/', copy_data=False):
+        dst_img=path_new+f'{split}/images/'
+        json_src = path+f'{split}/annotations/{split}.json'
+        json_dst=path_new+f'{split}/annotations/'
+        
+        for src_img in image_paths:
+            print('source',src_img)
+            print('dst', dst_img)
+            copy_file(src_img, dst_img)
+        copy_file(json_src, json_dst)
+
+        for i, mask in enumerate(annotation_to_mask(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
+            mask=(mask* 255).astype(np.uint8)
+            cv2.imwrite(os.path.join(json_dst,f'{i+1}.png'),mask)
+    return path_new
+
+def prepare_data_stenosis(path='stenExp/datasets/arcade/stenosis/', copy_data=False):
     if copy_data:
         create_dataset()
     for split in ['train', 'test', 'val']:

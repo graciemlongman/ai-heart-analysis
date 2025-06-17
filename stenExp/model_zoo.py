@@ -1,6 +1,5 @@
 from models.resunetplusplus import build_resunetplusplus
 from models.aunet import AttU_Net
-from models.unetr2d import *
 from models.transunet import TransUNet
 from torch import nn
 import torchvision
@@ -8,8 +7,8 @@ import sys
 import numpy as np
 
 
-def ModelZoo(choice, config=None):
-    if choice == 'resunet++':
+def ModelZoo(choice):
+    if choice == 'resunetplusplus':
         return build_resunetplusplus()
     elif choice == 'deeplabv3resnet101':
         model = torchvision.models.segmentation.deeplabv3_resnet101(weights='DEFAULT', 

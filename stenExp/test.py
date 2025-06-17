@@ -32,8 +32,8 @@ def process_mask(y_pred):
     y_pred = np.concatenate([y_pred, y_pred, y_pred], axis=2)
     return y_pred
 
-def evaluate(model, save_path, test_x, test_y, size, pp_threshold):
-    metrics_score, post_metrics = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold):
+    metrics_score, post_metrics_score = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     time_taken = []
 
     for i, (x, y) in tqdm(enumerate(zip(test_x, test_y)), total=len(test_x)):
@@ -83,26 +83,31 @@ def evaluate(model, save_path, test_x, test_y, size, pp_threshold):
 
             """Evaluation metrics for post processed"""
             post_score=calculate_metrics(mask, y_post_pred, y_true_proc='evaluate', y_pred_proc='postprocessed', size=size)
-            post_metrics=list(map(add, post_metrics, post_score))
+            post_metrics_score=list(map(add, post_metrics_score, post_score))
 
         """ Save the image - mask - pred """
         plot_true_vs_preds_to_file(size, save_path, name, save_img, save_mask, y_pred_3d, y_post_pred_3d)
 
-    print_score(metrics_score, len(test_x))
-    print_score(post_metrics, len(test_x))
-
+    """ Calc metrics """
+    metrics = mean_score(metrics_score, len(test_x))
+    post_metrics = mean_score(post_metrics_score, len(test_x))
     mean_time_taken = np.mean(time_taken)
-    mean_fps = 1/mean_time_taken
-    print("Mean FPS: ", mean_fps)
+
+    """ Save to file """
+    save_test_results_to_file(results_path, metrics, post_metrics, mean_time_taken, len(test_x))
 
 
 if __name__ == "__main__":
     """ Seeding """
     seeding(42)
 
+    """ Vars """
     model_choice = 'transunet'
-    folder =f'{model_choice}/one'
-    checkpoint_path = f"stenExp/model_runs/{model_choice}/one/checkpoint.pth"
+    optim_choice = 'one'
+
+    """ Directories and chkpt path """
+    folder =f'{model_choice}/{optim_choice}'
+    checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
 
     """ Load the checkpoint """
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -119,9 +124,15 @@ if __name__ == "__main__":
         if not os.path.exists(f"{save_path}/{item}"):
             os.makedirs(f"{save_path}/{item}")
         else:
-            print('Results folder already exists')
-            print('Check your directories :)')
-            sys.exit()
+            file_exists_print_and_exit()
+
+    results_path = f'{save_path}results.txt'
+    if os.path.exists(results_path):
+        file_exists_print_and_exit()
+    else:
+        train_log = open(results_path, "w")
+        train_log.write("\n")
+        train_log.close()
 
     size = (256, 256)
-    evaluate(model, save_path, test_x, test_y, size, 50)
+    evaluate(model, save_path, results_path, test_x, test_y, size, 50)

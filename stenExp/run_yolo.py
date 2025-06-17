@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import os,sys
 from preparedata import *
 from postprocess import *
-from utils import calculate_metrics, print_score, plot_true_vs_preds_to_file
+from utils import *
 from operator import add
 
 class SegModel:
@@ -10,23 +10,30 @@ class SegModel:
         self.model=YOLO("yolov8x-seg.pt")
         self.raw_data = raw_data_dir
         self.model_save_dir = save_path
+    
+    def prepare_data(self, preprocess=False):
+        prepare_data_for_yolo(self.raw_data, preprocess=preprocess)
 
-    def train_model(self, path, name, prepare_data=False):
-
-        if prepare_data == True:
-            prepare_data_for_yolo(self.raw_data, preprocess=True)
-
+    def train_model(self, path, name):
         #includes default augmentations in pipeline
-        self.model.train(data=path, imgsz=512, device=0, 
-                            epochs=500, batch=8, momentum=0.9, lr0=0.0001,
+        self.model.train(data=path, imgsz=512, device=0, optimizer='RMSprop',
+                            epochs=500, batch=8, lr0=0.0001,
                             patience=50, dropout=0.5, val=True,
                             project=self.model_save_dir, name=name)
         best_model_path = os.path.join(self.model_save_dir, name, 'weights', 'best.pt')
         print(f"Best model saved at: {best_model_path}")
         return best_model_path
-    
 
     def process_results(self, results, save_path):
+        
+        for item in ["mask", "joint", "procd_mask"]:
+            if not os.path.exists(f"{save_path}/{item}"):
+                os.makedirs(f"{save_path}/{item}")
+            else:
+                print('Results folder already exists')
+                print('Check your directories :)')
+                sys.exit()
+
         metrics, metrics_post=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         size=(256,256)
         for i, result in enumerate(results):
@@ -62,27 +69,20 @@ class SegModel:
 
             plot_true_vs_preds_to_file(size, save_path, name, image, y_true_3d, y_pred_3d, y_post_pred_3d)
         
-        print_score(metrics,num_imgs=300)
-        print_score(metrics_post, num_imgs=300)
+        mean_score(metrics,num_imgs=300, print_=True)
+        mean_score(metrics_post, num_imgs=300, print_=True)
 
     
 if __name__=='__main__':
     model_choice='yolov8x-seg'
-    name='one'
+    name='RMSprop'
     
-    model=SegModel(raw_data_dir='arcade/syntax/', save_path=f'stenExp/model_runs/{model_choice}')
-    #model.train_model(path='stenExp/datasets/arcade/yolo_stenosis/data.yaml', name=name)
+    model=SegModel(raw_data_dir='arcade/stenosis/', save_path=f'stenExp/model_runs/{model_choice}')
+    # model.prepare_data(preprocess=True)
+    model.train_model(path='stenExp/datasets/arcade/yolo_stenosis/data.yaml', name=name)
     
     best=YOLO(f'stenExp/model_runs/{model_choice}/{name}/weights/best.pt')
     results=best('stenExp/datasets/arcade/yolo_stenosis/images/test', save=False, project=f'stenExp/model_runs/{model_choice}/{name}', name='predict1')
     
     save_path=f'stenExp/model_runs/{model_choice}/{name}/results'
-    for item in ["mask", "joint", "procd_mask"]:
-        if not os.path.exists(f"{save_path}/{item}"):
-            os.makedirs(f"{save_path}/{item}")
-        else:
-            print('Results folder already exists')
-            print('Check your directories :)')
-            sys.exit()
-
     model.process_results(results, save_path=save_path)

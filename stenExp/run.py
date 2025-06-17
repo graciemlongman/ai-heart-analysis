@@ -1,8 +1,7 @@
 
 ### https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
 
-import os
-import sys
+import os, sys
 import time
 import datetime
 import albumentations as A
@@ -18,18 +17,19 @@ if __name__ == "__main__":
     """ Seeding """
     seeding(42)
 
+    """ Vars """
+    model_choice='attentionunet'
+    optim_choice='SGD'
+
     """ Directories and log file """
-    model_choice='deeplabv3resnet101'
-    folder = f'{model_choice}/one'
-    resume=True
+    folder = f'{model_choice}/{optim_choice}'
+    resume=False
 
     create_dir(f"stenExp/model_runs/{folder}")
     train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
     
     if os.path.exists(train_log_path):
-        print("Log file exists")
-        print('Exiting process - check your directories :)')
-        sys.exit()
+        file_exists_print_and_exit()
     else:
         train_log = open(train_log_path, "w")
         train_log.write("\n")
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     """ Dataset """
     # print('Preprocessing dataset...')
-    # preprocess(copy_data=True)
+    # prepare_data_stenosis(copy_data=True)
 
     print('Loading data and initialising dataset and data loader...')
     (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_data()
@@ -102,16 +102,14 @@ if __name__ == "__main__":
     if resume:
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 
-    if model_choice != 'transunet':
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr) 
-    else:
-        momentum=0.9
-        weight_decay=0.0001
-        optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
+    optimizer = OptZoo(choice=optim_choice, model=model, lr=lr)
+
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5)
+    
     loss_fn = DiceBCELoss()
     loss_name = "BCE Dice Loss"
-    data_str = f"Model: {model_choice}\nOptimizer: Adam\nLoss: {loss_name}\n"
+    
+    data_str = f"Model: {model_choice}\nOptimizer: {optim_choice}\nLoss: {loss_name}\n"
     print_and_save(train_log_path, data_str)
 
     """ Training the model """

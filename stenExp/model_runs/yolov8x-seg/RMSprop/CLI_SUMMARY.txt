@@ -1,0 +1,8 @@
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95)     Mask(P          R      mAP50  mAP50-95): 100%|██████████| 13/13 [00:01<00:00,  6.67it/s]
+                   all        200        406      0.375      0.409       0.33      0.112      0.441       0.48      0.416       0.13
+Speed: 0.1ms preprocess, 7.7ms inference, 0.0ms loss, 0.6ms postprocess per image
+Results saved to stenExp/model_runs/yolov8x-seg/RMSprop
+Best model saved at: stenExp/model_runs/yolov8x-seg/RMSprop/weights/best.pt
+
+Jaccard: 0.3448 - F1: 0.4553 - Recall: 0.4756 - Precision: 0.6914 - Acc: 0.9909 - F2: 0.4587 - HD: 3.9202
+Jaccard: 0.3401 - F1: 0.4507 - Recall: 0.4577 - Precision: 0.7022 - Acc: 0.9910 - F2: 0.4470 - HD: 3.9030

@@ -8,13 +8,18 @@ dependencies:
   - scipy
   - matplotlib
   - scikit-learn
-  - opencv  # or opencv-python-headless (not both)
+  - opencv 
   - ipykernel
   - jupyterlab
+  - tqdm
+  - scikit-image
   - pip
   - pip:
       - keras
       - albumentations
       - einops
+      - shapely
       - absl-py
-      - nvidia-cudnn-cu12
+      - torch
+      - torchvision
+      - ultralytics
