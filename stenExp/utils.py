@@ -35,18 +35,30 @@ def epoch_time(start_time, end_time):
     elapsed_mins = int(elapsed_time / 60)
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
+######
 
-def print_and_save(file_path, data_str):
-    print(data_str)
+#Adapted
+def print_and_save(file_path, data_str, print_=True):
+    if print_:
+        print(data_str)
     with open(file_path, "a") as file:
         file.write(data_str)
         file.write("\n")
-#######
+#####
 
 def file_exists_print_and_exit():
     print("Log file exists")
     print('Exiting process - check your directories :)')
     sys.exit()
+
+def create_file(path):
+    if os.path.exists(path):
+        file_exists_print_and_exit()
+    else:
+        train_log = open(path, "w")
+        train_log.write("\n")
+        train_log.close()
+
 
 ## Adapted from  https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/utils.py
 def calculate_metrics(y_true, y_pred, y_true_proc=True, y_pred_proc=True,size=None):
@@ -135,8 +147,6 @@ def OptZoo(choice, model, lr):
         return torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=0.0001) #TransUNet
     elif choice == 'RMSprop':
         return torch.optim.RMSprop(model.parameters(), lr=lr)
-    elif choice == 'Adadelta':
-        return torch.optim.Adadelta(model.parameters(), lr=lr)
     else:
         raise ValueError(f'Optimiser {choice} is not supported')
 

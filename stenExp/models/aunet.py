@@ -41,7 +41,6 @@ class conv_block(nn.Module):
             nn.ReLU(inplace=True)
         )
 
-
     def forward(self,x):
         x = self.conv(x)
         return x

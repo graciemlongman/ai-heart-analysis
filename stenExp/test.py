@@ -100,10 +100,13 @@ def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold)
 if __name__ == "__main__":
     """ Seeding """
     seeding(42)
+    
+    # pp_threshold = [25, 50, 75, 100, 125, 150]
+    # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'transunet'
-    optim_choice = 'one'
+    model_choice = 'attentionunet'
+    optim_choice = f'thresh_{thresh}'
 
     """ Directories and chkpt path """
     folder =f'{model_choice}/{optim_choice}'
@@ -127,12 +130,7 @@ if __name__ == "__main__":
             file_exists_print_and_exit()
 
     results_path = f'{save_path}results.txt'
-    if os.path.exists(results_path):
-        file_exists_print_and_exit()
-    else:
-        train_log = open(results_path, "w")
-        train_log.write("\n")
-        train_log.close()
+    create_file(results_path)
 
     size = (256, 256)
-    evaluate(model, save_path, results_path, test_x, test_y, size, 50)
+    evaluate(model, save_path, results_path, test_x, test_y, size, thresh)

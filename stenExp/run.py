@@ -18,8 +18,8 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='attentionunet'
-    optim_choice='SGD'
+    model_choice='aunet3'
+    optim_choice='Adam'
 
     """ Directories and log file """
     folder = f'{model_choice}/{optim_choice}'
@@ -27,13 +27,7 @@ if __name__ == "__main__":
 
     create_dir(f"stenExp/model_runs/{folder}")
     train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
-    
-    if os.path.exists(train_log_path):
-        file_exists_print_and_exit()
-    else:
-        train_log = open(train_log_path, "w")
-        train_log.write("\n")
-        train_log.close()
+    create_file(train_log_path)
 
     """ Record Date & Time """
     datetime_object = str(datetime.datetime.now())
