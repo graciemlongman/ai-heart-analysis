@@ -60,28 +60,30 @@ class bottleneck(nn.Module):
 
         self.Conv1 = nn.Sequential(
             nn.Conv2d(ch_in, width, kernel_size=1, stride=1, bias=False),
-            nn.BatchNorm(width),
-            nn.ReLU(width)
+            nn.BatchNorm2d(width),
+            nn.ReLU(inplace=True)
             )
         
         self.Conv2 = nn.Sequential(
-            nn.Conv2d(width, width, kernel_size=3, stride=1, bias=False),
-            nn.BatchNorm(width),
-            nn.ReLU(width)
+            nn.Conv2d(width, width, kernel_size=3, stride=1, padding=1, dilation=1, bias=False),
+            nn.BatchNorm2d(width),
+            nn.ReLU(inplace=True)
             )
         
         self.Conv3 = nn.Sequential(
             nn.Conv2d(width, ch_out, kernel_size=1, stride=1, bias=False),
-            nn.BatchNorm(ch_out),
+            nn.BatchNorm2d(ch_out),
             )
         
         self.Relu = nn.ReLU(inplace=True)
     
     def forward(self, x):
         x_d = self.Downsample(x)
+        
         x = self.Conv1(x)
         x = self.Conv2(x)
         x = self.Conv3(x)
+        
         x = x + x_d
         x = self.Relu(x)
 
@@ -167,9 +169,9 @@ class ASPP(nn.Module):
         x = self.c5(x_cat)
         return x
 
-class AttU_Net2(nn.Module):
+class AttU_Net3(nn.Module):
     def __init__(self,img_ch=3,output_ch=1):
-        super(AttU_Net2,self).__init__()
+        super(AttU_Net3,self).__init__()
         
         self.Maxpool = nn.MaxPool2d(kernel_size=2,stride=2)
 

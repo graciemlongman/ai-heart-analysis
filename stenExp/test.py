@@ -32,7 +32,7 @@ def process_mask(y_pred):
     y_pred = np.concatenate([y_pred, y_pred, y_pred], axis=2)
     return y_pred
 
-def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold):
+def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold=50):
     metrics_score, post_metrics_score = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     time_taken = []
 
@@ -105,8 +105,8 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'attentionunet'
-    optim_choice = f'thresh_{thresh}'
+    model_choice = 'aunet3'
+    optim_choice = 'Adam'
 
     """ Directories and chkpt path """
     folder =f'{model_choice}/{optim_choice}'
@@ -133,4 +133,4 @@ if __name__ == "__main__":
     create_file(results_path)
 
     size = (256, 256)
-    evaluate(model, save_path, results_path, test_x, test_y, size, thresh)
+    evaluate(model, save_path, results_path, test_x, test_y, size)

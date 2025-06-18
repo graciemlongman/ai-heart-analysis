@@ -1,6 +1,9 @@
 import os
 from utils import create_file, print_and_save
 
+# modify script as necessary for how you want results table to look
+# find . -type f -name "results.txt"
+
 opt_paths = ['./stenExp/model_runs/deeplabv3resnet101/RMSprop/results/results.txt',
                     './stenExp/model_runs/deeplabv3resnet101/one/results/results.txt',
                     './stenExp/model_runs/deeplabv3resnet101/SGD/results/results.txt',
@@ -18,10 +21,15 @@ pp_paths = ['./stenExp/model_runs/attentionunet/postprocexp/thresh_25/results/re
             './stenExp/model_runs/attentionunet/postprocexp/thresh_125/results/results.txt',
             './stenExp/model_runs/attentionunet/postprocexp/thresh_150/results/results.txt']
 
+mod_paths = ['./stenExp/model_runs/attentionunet/one/results/results.txt',
+             './stenExp/model_runs/aunet1/Adam/results/results.txt',
+             './stenExp/model_runs/aunet2/Adam/results/results.txt',
+             './stenExp/model_runs/aunet3/Adam/results/results.txt',]
 
-path_to_log_files = pp_paths
-save_path = 'stenExp/model_runs/attentionunet/postprocexp/pp_scores.csv'
-headings='Model,Threshold,Jaccard,F1,Recall,Precision,Acc,F2,HD,MFPS,MSPF'
+
+path_to_log_files = mod_paths
+save_path = 'stenExp/scores/mod_scores.csv'
+headings='Model,Jaccard,F1,Recall,Precision,Acc,F2,HD,MFPS,MSPF'
 
 create_file(save_path)
 print_and_save(save_path, headings, print_=False)
@@ -36,7 +44,7 @@ for log_file in path_to_log_files:
         for line in file:
             part=line.strip().split()
             if 'Jaccard' in line:
-                scores.append(f'{model}, {threshold}, {part[1]}, {part[4]}, {part[7]}, {part[10]}, {part[13]}, {part[16]}, {part[19]}')
+                scores.append(f'{model}, {part[1]}, {part[4]}, {part[7]}, {part[10]}, {part[13]}, {part[16]}, {part[19]}')
             if 'Mean FPS' in line:
                 mean_fps = part[2]
             if 'Mean SPF' in line:

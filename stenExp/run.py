@@ -147,3 +147,5 @@ if __name__ == "__main__":
         train_log_path=[f"stenExp/model_runs/{folder}/train_log.txt", f"stenExp/model_runs/{folder}/train_log_resumed.txt"]
 
     plot_training_curve(train_log_path, f"stenExp/model_runs/{folder}/loss_epoch_curve.png")
+
+    print('fin')
