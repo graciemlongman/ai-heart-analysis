@@ -1,3 +1,9 @@
                  Class     Images  Instances      Box(P          R      mAP50  mAP50-95)     Mask(P          R      mAP50  mAP50-95): 100%|██████████| 13/13 [00:02<00:00,  4.51it/s]
                    all        200        406      0.433      0.356      0.325       0.12      0.477      0.409      0.385      0.131
 Speed: 0.2ms preprocess, 9.8ms inference, 0.0ms loss, 0.7ms postprocess per image
+
+Jaccard: 0.3234 - F1: 0.4244 - Recall: 0.4315 - Precision: 0.7354 - Acc: 0.9914 - F2: 0.4205 - HD: 4.0100
+Jaccard: 0.3163 - F1: 0.4183 - Recall: 0.4124 - Precision: 0.7452 - Acc: 0.9915 - F2: 0.4075 - HD: 3.9999
+
+Mean FPS: 102.040816
+Mean SPF: 0.0098

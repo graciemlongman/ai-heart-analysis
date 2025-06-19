@@ -75,14 +75,14 @@ class SegModel:
     
 if __name__=='__main__':
     model_choice='yolov8x-seg'
-    name='RMSprop'
+    name='one'
     
     model=SegModel(raw_data_dir='arcade/stenosis/', save_path=f'stenExp/model_runs/{model_choice}')
     # model.prepare_data(preprocess=True)
-    model.train_model(path='stenExp/datasets/arcade/yolo_stenosis/data.yaml', name=name)
+    # model.train_model(path='stenExp/datasets/arcade/yolo_stenosis/data.yaml', name=name)
     
     best=YOLO(f'stenExp/model_runs/{model_choice}/{name}/weights/best.pt')
-    results=best('stenExp/datasets/arcade/yolo_stenosis/images/test', save=False, project=f'stenExp/model_runs/{model_choice}/{name}', name='predict1')
+    results=best('stenExp/datasets/arcade/yolo_stenosis/images/test', save=False, project=f'stenExp/model_runs/{model_choice}/{name}', name='predict')
     
     save_path=f'stenExp/model_runs/{model_choice}/{name}/results'
     model.process_results(results, save_path=save_path)
