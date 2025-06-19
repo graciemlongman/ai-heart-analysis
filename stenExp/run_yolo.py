@@ -1,8 +1,8 @@
 from ultralytics import YOLO
 import os,sys
-from preparedata import *
 from postprocess import *
-from utils import *
+from utils.preparedata import *
+from utils.utils import *
 from operator import add
 
 class SegModel:

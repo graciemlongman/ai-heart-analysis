@@ -8,10 +8,9 @@ import albumentations as A
 import torch
 from torch.utils.data import DataLoader
 from utils import *
-from metrics import DiceBCELoss
-from preparedata import *
-from train import *
-from model_zoo import ModelZoo
+from utils.metrics import DiceBCELoss
+from utils.preparedata import *
+from trainer import *
 
 if __name__ == "__main__":
     """ Seeding """

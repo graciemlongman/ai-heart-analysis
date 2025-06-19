@@ -7,10 +7,9 @@ import cv2
 from tqdm import tqdm
 import torch
 import collections
-from utils import *
-from preparedata import load_data
+from utils.utils import *
+from utils.preparedata import load_data
 from postprocess import *
-from model_zoo import ModelZoo
 
 def format_mask_for_post_processing(y_pred):
     y_pred = y_pred[0].cpu().numpy()
