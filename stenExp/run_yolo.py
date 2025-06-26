@@ -68,14 +68,15 @@ class SegModel:
             y_true_3d=np.stack((y_true,) * 3, axis=-1)
 
             plot_true_vs_preds_to_file(size, save_path, name, image, y_true_3d, y_pred_3d, y_post_pred_3d)
-        
+            overlay_results(size, save_path, name, image, y_true_3d, y_pred_3d, y_post_pred_3d)
+
         mean_score(metrics,num_imgs=300, print_=True)
         mean_score(metrics_post, num_imgs=300, print_=True)
 
     
 if __name__=='__main__':
     model_choice='yolov8x-seg'
-    name='one'
+    name='SGD'
     
     model=SegModel(raw_data_dir='arcade/stenosis/', save_path=f'stenExp/model_runs/{model_choice}')
     # model.prepare_data(preprocess=True)
