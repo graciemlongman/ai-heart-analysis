@@ -23,3 +23,5 @@ dependencies:
       - torch
       - torchvision
       - ultralytics
+      - timm
+      - mamba-ssm #pip install git+https://github.com/state-spaces/mamba.git --no-build-isolation

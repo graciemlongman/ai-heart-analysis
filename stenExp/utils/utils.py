@@ -7,8 +7,16 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import torch
 from sklearn.utils import shuffle
-from metrics import precision, recall, F2, dice_score, jac_score, hd_dist
 from sklearn.metrics import accuracy_score, confusion_matrix
+try:
+    from utils.metrics import precision, recall, F2, dice_score, jac_score, hd_dist
+except:
+    pass
+
+try:
+    from stenExp.utils.metrics import precision, recall, F2, dice_score, jac_score, hd_dist
+except:
+    pass
 
 ## https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/utils.py
 """ Seeding the randomness. """
@@ -140,6 +148,18 @@ def plot_true_vs_preds_to_file(size, save_path, name, image, y_true, y_pred, y_p
     cv2.imwrite(f"{save_path}/mask/{name}", y_pred)
     cv2.imwrite(f"{save_path}/procd_mask/{name}", y_post_pred)
 
+def overlay_results(size, save_path, name, image, y_true, y_pred, y_post_pred):
+    overlay_dir = os.path.join(save_path, "overlay")
+    os.makedirs(overlay_dir, exist_ok=True)
+
+    line = np.ones((size[0], 10, 3)) * 255
+    cat_raw_imgs = np.concatenate([image, line, image, line, image, line, image], axis=1)
+    cat_images = np.concatenate([image, line, y_true, line, y_pred, line, y_post_pred], axis=1)
+    
+    overlaid_images = cv2.addWeighted(cat_raw_imgs, 0.5, cat_images, 0.5, 0)
+    cv2.imwrite(f"{save_path}/overlay/{name}", overlaid_images)
+
+
 def OptZoo(choice, model, lr):
     if choice == 'Adam':
         return torch.optim.Adam(model.parameters(), lr=lr)
@@ -150,14 +170,19 @@ def OptZoo(choice, model, lr):
     else:
         raise ValueError(f'Optimiser {choice} is not supported')
 
-from models.resunetplusplus import build_resunetplusplus
-from models.aunet import AttU_Net
-from models.aunet1 import AttU_Net1
-from models.aunet2 import AttU_Net2
-from models.aunet3 import AttU_Net3
-from models.transunet import TransUNet
+try:
+    from models.resunetplusplus import build_resunetplusplus
+    from models.aunet import AttU_Net
+    from models.aunet1 import AttU_Net1
+    from models.aunet2 import AttU_Net2
+    from models.aunet3 import AttU_Net3
+    from models.transunet import TransUNet
+    from models.saumamba.vmunet import VMUNet
+except:
+    pass
 from torch import nn
 import torchvision
+
 def ModelZoo(choice):
     if choice == 'resunetplusplus':
         return build_resunetplusplus()
@@ -166,8 +191,6 @@ def ModelZoo(choice):
                                                 progress=True, aux_loss=None)
         model.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
         return model
-    elif choice == 'attentionunet':
-        return AttU_Net()
     elif choice == 'transunet':
         return TransUNet(img_dim=256,
                           in_channels=3,
@@ -177,6 +200,20 @@ def ModelZoo(choice):
                           block_num=8,
                           patch_dim=16,
                           class_num=1)
+    elif choice == 'sa_umamba':
+        return VMUNet(num_classes=1,
+                        input_channels=3,
+                        depths=[2,2,2,2],
+                        depths_decoder=[2,2,2,1],
+                        drop_path_rate=0.2)
+    elif choice == 'saumamba':
+        return VMUNet(num_classes=1,
+                        input_channels=3,
+                        depths=[2,2,2,2],
+                        depths_decoder=[2,2,2,1],
+                        drop_path_rate=0.2)
+    elif choice == 'attentionunet':
+        return AttU_Net()
     elif choice == 'aunet1':
         return AttU_Net1()
     elif choice == 'aunet2':

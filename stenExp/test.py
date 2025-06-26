@@ -8,7 +8,7 @@ from tqdm import tqdm
 import torch
 import collections
 from utils.utils import *
-from utils.preparedata import load_data
+from preparedata import load_data
 from postprocess import *
 
 def format_mask_for_post_processing(y_pred):
@@ -85,7 +85,8 @@ def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold=
             post_metrics_score=list(map(add, post_metrics_score, post_score))
 
         """ Save the image - mask - pred """
-        plot_true_vs_preds_to_file(size, save_path, name, save_img, save_mask, y_pred_3d, y_post_pred_3d)
+        # plot_true_vs_preds_to_file(size, save_path, name, save_img, save_mask, y_pred_3d, y_post_pred_3d)
+        overlay_results(size, save_path, name, save_img, save_mask, y_pred_3d, y_post_pred_3d)
 
     """ Calc metrics """
     metrics = mean_score(metrics_score, len(test_x))
@@ -93,7 +94,7 @@ def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold=
     mean_time_taken = np.mean(time_taken)
 
     """ Save to file """
-    save_test_results_to_file(results_path, metrics, post_metrics, mean_time_taken, len(test_x))
+    # save_test_results_to_file(results_path, metrics, post_metrics, mean_time_taken, len(test_x))
 
 
 if __name__ == "__main__":
@@ -104,8 +105,8 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'aunet3'
-    optim_choice = 'Adam'
+    model_choice = sys.argv[1]
+    optim_choice = sys.argv[2]
 
     """ Directories and chkpt path """
     folder =f'{model_choice}/{optim_choice}'
@@ -122,11 +123,11 @@ if __name__ == "__main__":
     (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_data()
 
     save_path = f"stenExp/model_runs/{folder}/results/"
-    for item in ["mask", "joint", "procd_mask"]:
-        if not os.path.exists(f"{save_path}/{item}"):
-            os.makedirs(f"{save_path}/{item}")
-        else:
-            file_exists_print_and_exit()
+    # for item in ["mask", "joint", "procd_mask"]:
+    #     if not os.path.exists(f"{save_path}/{item}"):
+    #         os.makedirs(f"{save_path}/{item}")
+    #     else:
+    #         file_exists_print_and_exit()
 
     results_path = f'{save_path}results.txt'
     create_file(results_path)

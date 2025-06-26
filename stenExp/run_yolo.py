@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 import os,sys
 from postprocess import *
-from utils.preparedata import *
+from preparedata import *
 from utils.utils import *
 from operator import add
 

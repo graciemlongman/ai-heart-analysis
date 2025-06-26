@@ -7,9 +7,9 @@ import datetime
 import albumentations as A
 import torch
 from torch.utils.data import DataLoader
-from utils import *
+from utils.utils import *
 from utils.metrics import DiceBCELoss
-from utils.preparedata import *
+from preparedata import *
 from trainer import *
 
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='aunet3'
+    model_choice='saumamba'
     optim_choice='Adam'
 
     """ Directories and log file """
