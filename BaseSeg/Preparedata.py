@@ -69,7 +69,7 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
     id_map_rca = {5:0, 6:1, 7:2, 8:3, 9:4, 10:5, 11:6, 12:7, 13:8, 14:9, 15:10, 16:11, 17:12, 18:13, 19:14, 24:15, 25:16}
     
     #make dataset directories
-    for dataset_new in ['BaseSeg/datasets/syntaxLCA', 'BaseSeg/datsets/syntaxRCA']:
+    for dataset_new in ['BaseSeg/datasets/syntaxLCA', 'BaseSeg/datasets/syntaxRCA']:
         if os.path.exists(dataset_new)==False:
             os.makedirs(dataset_new)
             write_yaml(dataset_new, denom=str(dataset_new[-3:]))
@@ -151,5 +151,6 @@ def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/datasets
 if __name__ == '__main__':
     file_store=load_annotations(dataset_dir='arcade/syntax/')
     label_store = classify_l_r(file_store=file_store)
-    # seg_prepare_data(preprocess=False)
+    seg_prepare_data(preprocess=True)
+    cls_prepare_data(preprocess=True)
 

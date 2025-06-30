@@ -211,7 +211,8 @@ def ModelZoo(choice):
                         input_channels=3,
                         depths=[2,2,2,2],
                         depths_decoder=[2,2,2,1],
-                        drop_path_rate=0.2)
+                        drop_path_rate=0.2,
+                        load_ckpt_path='models/saumamba/pretrained_weights/')
     elif choice == 'attentionunet':
         return AttU_Net()
     elif choice == 'aunet1':

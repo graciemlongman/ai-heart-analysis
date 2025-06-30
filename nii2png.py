@@ -72,19 +72,19 @@ def calc_metrics(images, masks, preds, size, save_path, results_path):
 
 if __name__ == '__main__':
     input_folder = 'xLSTM-UNet-PyTorch/data/nnUNet_results/Dataset111_ArcadeXCA/inference/'
-    out_preds = 'stenExp/model_runs/xLSTM-UNet/one/preds/'
+    out_preds = 'stenExp/model_runs/xLSTM-UNet/two/preds/'
 
     labels_folder = 'xLSTM-UNet-PyTorch/data/nnUNet_raw/Dataset111_ArcadeXCA/labelsTs/'
-    out_masks = 'stenExp/model_runs/xLSTM-UNet/one/labelsTs/'
+    out_masks = 'stenExp/model_runs/xLSTM-UNet/two/labelsTs/'
 
     input_images_folder = 'xLSTM-UNet-PyTorch/data/nnUNet_raw/Dataset111_ArcadeXCA/imagesTs/'
-    out_images = 'stenExp/model_runs/xLSTM-UNet/one/imagesTs/'
+    out_images = 'stenExp/model_runs/xLSTM-UNet/two/imagesTs/'
 
-    # nifti2png(input_folder, out_preds)
-    # nifti2png(labels_folder, out_masks)
-    # nifti2png(input_images_folder, out_images)
+    nifti2png(input_folder, out_preds)
+    nifti2png(labels_folder, out_masks)
+    nifti2png(input_images_folder, out_images)
 
-    save_path = 'stenExp/model_runs/xLSTM-UNet/one/results/'
-    results_path = 'stenExp/model_runs/xLSTM-UNet/one/results/results.txt'
+    save_path = 'stenExp/model_runs/xLSTM-UNet/two/results/'
+    results_path = 'stenExp/model_runs/xLSTM-UNet/two/results/results.txt'
     size=(256,256)
     calc_metrics(out_images, out_masks, out_preds, size, save_path, results_path)
