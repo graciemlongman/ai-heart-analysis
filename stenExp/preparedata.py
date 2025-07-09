@@ -258,11 +258,19 @@ class ARCADE_DATASET(Dataset):
         """ Image """
         image = cv2.imread(self.images_path[index], cv2.IMREAD_COLOR)
         mask = cv2.imread(self.masks_path[index], cv2.IMREAD_GRAYSCALE)
+        if self.bbox:
+            box = cv2.imread(self.boxes_path[index], cv2.IMREAD_GRAYSCALE)
 
         if self.transform is not None:
-            augmentations = self.transform(image=image, mask=mask)
-            image = augmentations["image"]
-            mask = augmentations["mask"]
+            if self.bbox:
+                augmentations = self.transform(image=image, mask=mask, box=box)
+                image = augmentations["image"]
+                mask = augmentations["mask"]
+                box = augmentations['box']
+            else:
+                augmentations = self.transform(image=image, mask=mask)
+                image = augmentations["image"]
+                mask = augmentations["mask"]
 
         image = cv2.resize(image, self.size)
         image = np.transpose(image, (2, 0, 1))
@@ -273,10 +281,6 @@ class ARCADE_DATASET(Dataset):
         mask = mask/255.0 
 
         if self.bbox:
-            box = cv2.imread(self.boxes_path[index], cv2.IMREAD_GRAYSCALE)
-            if self.transform is not None:
-                augmentations = self.transform(box=box)
-                box = augmentations['box']
             box = cv2.resize(box, self.size)
             box = np.expand_dims(box, axis=0)
             box=box/255.0

@@ -74,10 +74,10 @@ class BB_Unet(Module):
         else:
             no_grad_state = False
 
-        self.train = True if partition == 'train' else False
+        self.train_flag = True if partition == 'train' else False
         
         #Downsampling path
-        self.conv1 = DownConv(1, 64, drop_rate, bn_momentum)
+        self.conv1 = DownConv(3, 64, drop_rate, bn_momentum)
         self.mp1 = nn.MaxPool2d(2)
 
         self.conv2 = DownConv(64, 128, drop_rate, bn_momentum)
@@ -115,7 +115,7 @@ class BB_Unet(Module):
         x4 = self.conv4(p3)
         
         # bbox encoder
-        if self.train: #i.e. dont have bboxes when we run inference
+        if self.train_flag: #i.e. dont have bboxes when we run inference
             x3 = x3*self.b1(bb)
             x2 = x2*self.b2(bb)
             x1 = x1*self.b3(bb)

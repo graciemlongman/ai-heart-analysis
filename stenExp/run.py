@@ -18,9 +18,9 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='bbunet'
-    bbox=True #load bbox into data loader or not
-    optim_choice='Adam'
+    model_choice='umambaBot' #'bbunet'
+    bbox=False#True #load bbox into data loader or not
+    optim_choice='RMSprop' #'Adam'
     resume=False
 
     """ Directories and log file """
@@ -61,13 +61,15 @@ if __name__ == "__main__":
     #check_labels(train_loader, valid_loader, zip(test_x,test_y))
 
     """ Model """
-    device = torch.device('cuda')
     model = ModelZoo(choice=model_choice, partition='train')
     if model_choice == 'saumamba':
         model.load_from()
+
+    device = torch.device('cuda')
+    model.to(device)
+
     if resume:
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
-    model.to(device)
 
     optimizer = OptZoo(choice=optim_choice, model=model, lr=lr)
 
@@ -87,10 +89,10 @@ if __name__ == "__main__":
     for epoch in range(num_epochs):
         start_time = time.time()
 
-        train_loss, train_metrics = train(model, train_loader, optimizer, loss_fn, device)
-        valid_loss, valid_metrics = evaluate(model, valid_loader, loss_fn, device)
+        train_loss, train_metrics = train(model, train_loader, optimizer, loss_fn, device, bbox)
+        valid_loss, valid_metrics = evaluate(model, valid_loader, loss_fn, device, bbox)
         scheduler.step(valid_loss)
-
+ 
         if valid_metrics[1] > best_valid_metrics:
             data_str = f"Valid F1 improved from {best_valid_metrics:2.4f} to {valid_metrics[1]:2.4f}. Saving checkpoint: {checkpoint_path}"
             print_and_save(train_log_path, data_str)
