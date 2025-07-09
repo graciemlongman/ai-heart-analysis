@@ -46,7 +46,7 @@ def make_directories(path_new, version='torch'):
         if os.path.exists(path_new)==False:
             os.makedirs(path_new)
             for split in ['train', 'test','val']:
-                for type in ['annotations', 'images']:
+                for type in ['annotations', 'images', 'boxes']:
                     os.makedirs(f'{path_new}/{split}/{type}/')
     elif version == 'yolo':
         if os.path.exists(path_new)==False:
@@ -229,12 +229,8 @@ def load_data(path='stenExp/datasets/arcade/stenosis/', bbox=False):
 
         images = sorted(glob(os.path.join(path, split, "images", "*.png")))
         labels = sorted(glob(os.path.join(path, split, "annotations", "*.png")))
-
-        if bbox:
-            bboxes = sorted(glob(os.path.join(path, split, "boxes", "*.png")))
-            return images, labels, bboxes
-        else:
-            return images, labels, None
+        bboxes = sorted(glob(os.path.join(path, split, "boxes", "*.png")))
+        return images, labels, bboxes
     
     train_x, train_y, train_b = get_data(path, split='train', bbox=bbox)
     valid_x, valid_y, valid_b = get_data(path, split='val', bbox=bbox)
@@ -295,6 +291,7 @@ from sklearn.utils import shuffle
 from utils.utils import print_and_save
 def data_loader(train_log_path, bbox, size, transform, batch_size):
     if bbox:
+        print('Including bbox')
         (train_x, train_y, train_b), (valid_x, valid_y, valid_b), (test_x, test_y, test_b) = load_data(bbox=True)
         train_x, train_y, train_b = shuffle(train_x, train_y, train_b, random_state=42)
         

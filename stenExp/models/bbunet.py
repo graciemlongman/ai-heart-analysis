@@ -129,4 +129,6 @@ class BB_Unet(Module):
         
         return x5
 
+if __name__ == '__main__':
+    model = BB_Unet(partition='train')
 

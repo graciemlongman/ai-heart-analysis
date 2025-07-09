@@ -8,3 +8,4 @@ stenExp/datasets
 
 *.pth
 *.pt
+*__pycache__*

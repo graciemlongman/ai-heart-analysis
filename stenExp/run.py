@@ -11,6 +11,7 @@ from utils.utils import *
 from utils.metrics import DiceBCELoss
 from preparedata import *
 from trainer import *
+from models.aunet import AttU_Net
 
 if __name__ == "__main__":
     """ Seeding """
