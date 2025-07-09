@@ -173,9 +173,15 @@ def OptZoo(choice, model, lr):
 try:
     from models.resunetplusplus import build_resunetplusplus
     from models.aunet import AttU_Net
-    from models.aunet1 import AttU_Net1
-    from models.aunet2 import AttU_Net2
-    from models.aunet3 import AttU_Net3
+    from models.aunet1 import AttU_Net1 #deformable
+    from models.aunet2 import AttU_Net2 #aspp
+    from models.aunet3 import AttU_Net3 #assp + bottleneck
+    from models.aunet4 import AttU_Net4 #bottleneck
+    from models.attUMambaEnc import AttUMambaEnc, InitWeights_He #aunet dec
+    from models.attUMambaBot import AttUMambaBot
+    from models.attUMambaEnc_2 import UMambaEnc_2 #umamba decoder
+    from models.attUMambaBot_2 import UMambaBot_2
+    from models.umambaBot import UMambaBot
     from models.transunet import TransUNet
     from models.saumamba.vmunet import VMUNet
 except:
@@ -200,19 +206,13 @@ def ModelZoo(choice):
                           block_num=8,
                           patch_dim=16,
                           class_num=1)
-    elif choice == 'sa_umamba':
-        return VMUNet(num_classes=1,
-                        input_channels=3,
-                        depths=[2,2,2,2],
-                        depths_decoder=[2,2,2,1],
-                        drop_path_rate=0.2)
     elif choice == 'saumamba':
         return VMUNet(num_classes=1,
                         input_channels=3,
                         depths=[2,2,2,2],
                         depths_decoder=[2,2,2,1],
                         drop_path_rate=0.2,
-                        load_ckpt_path='models/saumamba/pretrained_weights/')
+                        load_ckpt_path='stenExp/models/saumamba/pretrained_weights/vmamba_small_e238_ema.pth')
     elif choice == 'attentionunet':
         return AttU_Net()
     elif choice == 'aunet1':
@@ -221,6 +221,48 @@ def ModelZoo(choice):
         return AttU_Net2()
     elif choice == 'aunet3':
         return AttU_Net3()
+    elif choice == 'aunet4':
+        return AttU_Net4()
+    elif choice == 'attumambaEnc':
+        model = AttUMambaEnc(input_size=(256,256),
+                 n_stages=7,
+                 features_per_stage=(32, 64, 128, 256, 512, 512, 512),
+                 kernel_sizes=3,
+                 strides=(1, 2, 2, 2, 2, 2, 2),
+                 n_blocks_per_stage=(1, 3, 4, 6, 6, 6, 6))
+        return model.apply(InitWeights_He(1e-2))
+    elif choice == 'attumambaBot':
+        model = AttUMambaBot(input_size=(256,256),
+                 n_stages=7,
+                 features_per_stage=(32, 64, 128, 256, 512, 512, 512),
+                 kernel_sizes=3,
+                 strides=(1, 2, 2, 2, 2, 2, 2),
+                 n_blocks_per_stage=(1, 3, 4, 6, 6, 6, 6))
+        return model.apply(InitWeights_He(1e-2))
+    elif choice == 'attumambaEnc_2':
+        model = UMambaEnc_2(input_size=(256,256), input_channels=3, n_stages=7, features_per_stage=(32, 64, 128, 256, 512, 512, 512),
+                              conv_op=nn.Conv2d, kernel_sizes=3, strides=(1, 2, 2, 2, 2, 2, 2),
+                              n_conv_per_stage=[1, 3, 4, 6, 6, 6, 6], num_classes=1,
+                              n_conv_per_stage_decoder=[1, 1, 1, 1, 1, 1],
+                              conv_bias=True, norm_op=nn.InstanceNorm2d, norm_op_kwargs={},
+                              nonlin=nn.LeakyReLU, nonlin_kwargs={'inplace': True}, deep_supervision=False)
+        return model.apply(InitWeights_He(1e-2))
+    elif choice == 'attumambaBot_2':
+        model = UMambaBot_2(input_channels=3, n_stages=7, features_per_stage=(32, 64, 128, 256, 512, 512, 512),
+                              conv_op=nn.Conv2d, kernel_sizes=3, strides=(1, 2, 2, 2, 2, 2, 2),
+                              n_conv_per_stage=[1, 3, 4, 6, 6, 6, 6], num_classes=1,
+                              n_conv_per_stage_decoder=[1, 1, 1, 1, 1, 1],
+                              conv_bias=True, norm_op=nn.InstanceNorm2d, norm_op_kwargs={},
+                              nonlin=nn.LeakyReLU, nonlin_kwargs={'inplace': True}, deep_supervision=False)
+        return model.apply(InitWeights_He(1e-2))
+    elif choice == 'umambaBot':
+        model = UMambaBot(input_channels=3, n_stages=7, features_per_stage=(32, 64, 128, 256, 512, 512, 512),
+                              conv_op=nn.Conv2d, kernel_sizes=3, strides=(1, 2, 2, 2, 2, 2, 2),
+                              n_conv_per_stage=[1, 3, 4, 6, 6, 6, 6], num_classes=1,
+                              n_conv_per_stage_decoder=[1, 1, 1, 1, 1, 1],
+                              conv_bias=True, norm_op=nn.InstanceNorm2d, norm_op_kwargs={},
+                              nonlin=nn.LeakyReLU, nonlin_kwargs={'inplace': True}, deep_supervision=False)
+        return model.apply(InitWeights_He(1e-2))
     else:
         raise ValueError(f"Model choice '{choice}' is not supported.")
 

@@ -36,9 +36,17 @@ pp_paths = ['./stenExp/model_runs/attentionunet/postprocexp/thresh_25/results/re
 mod_paths = ['./stenExp/model_runs/attentionunet/one/results/results.txt',
              './stenExp/model_runs/aunet1/Adam/results/results.txt',
              './stenExp/model_runs/aunet2/Adam/results/results.txt',
-             './stenExp/model_runs/aunet3/Adam/results/results.txt',]
+             './stenExp/model_runs/aunet3/Adam/results/results.txt',
+             './stenExp/model_runs/aunet4/Adam/results/results.txt',]
 
+mamba_paths = ['./stenExp/model_runs/umambaBot/Adam/results/results.txt',
+                './stenExp/model_runs/umambaEnc/Adam/results/results.txt',
+                './stenExp/model_runs/attumambaBot/Adam/results/results.txt',
+                './stenExp/model_runs/attumambaBot_2/Adam/results/results.txt',
+                './stenExp/model_runs/attumambaEnc/Adam/results/results.txt',
+                './stenExp/model_runs/attumambaEnc_2/Adam/results/results.txt',]
 
+""" Vars """
 path_to_log_files = opt_paths
 save_path = 'stenExp/scores/opt_scores.csv'
 headings='Model,Optimiser,Jaccard,F1,Recall,Precision,Acc,F2,HD,MFPS,MSPF'

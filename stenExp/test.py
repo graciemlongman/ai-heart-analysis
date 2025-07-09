@@ -105,7 +105,7 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'attentionunet'
+    model_choice = 'umambaBot'
     optim_choice = 'Adam'
 
     """ Directories and chkpt path """

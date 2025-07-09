@@ -95,8 +95,7 @@ def prepare_data_for_nnunet(path='arcade/stenosis/', path_new='Dataset111_Arcade
         for i, src_img in enumerate(image_paths):
             i_str = str(i + 1001) if split == 'val' else str(i + 1)
             num = i_str.zfill(4)
-            #shutil.copyfile(src_img, f'{dst_img}/arcade_{num}_0000.png')
-            img_np = np.array(Image.open(src_img).convert('RGB')) #.transpose(2,0,1)
+            img_np = np.array(Image.open(src_img).convert('RGB'))
             nib.save(nib.Nifti1Image(img_np.astype(np.uint8), affine=np.eye(4)),f'{dst_img}/arcade_{num}_0000.nii.gz')
 
         print('Moving Masks', split)
@@ -105,7 +104,6 @@ def prepare_data_for_nnunet(path='arcade/stenosis/', path_new='Dataset111_Arcade
             mask=np.stack([mask,mask,mask],axis=-1)
             i_str = str(i + 1001) if split == 'val' else str(i+1)
             num = i_str.zfill(4)
-            #cv2.imwrite(os.path.join(dst_msk,f'arcade_{num}.png'),mask)
             nib.save(nib.Nifti1Image(mask,affine=np.eye(4)), f'{dst_msk}/arcade_{num}.nii.gz')
     print('Fin')
 
@@ -165,6 +163,29 @@ def annotation_to_mask(path_to_json, split):
 
     return masks 
 
+def annotation_to_box(path_to_json, split):
+    num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
+
+    with open(path_to_json, encoding="utf-8") as file:
+        file_store = json.load(file)
+        annotations = file_store['annotations']
+
+    name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
+    
+
+    boxes = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
+    for ann in annotations:
+        p = np.array(ann["bbox"], dtype=np.int32)
+        points = np.array([[p[0], p[1]], [p[0]+p[2], p[1]], [p[0]+p[2],p[1]+p[3]], [p[0], p[1]+p[3]]], dtype=np.int32)
+        # print(points)
+        # sys.exit()
+        #points = points.reshape((-1,1,2))
+        tmp = np.zeros((512, 512), dtype=np.uint8)
+        cv2.fillPoly(tmp, [points], (1))
+        boxes[int(name_cls[ann["image_id"]])-1] |= tmp
+
+    return boxes 
+
 def create_dataset(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/'):
     make_directories(path_new)
     
@@ -175,6 +196,7 @@ def create_dataset(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/st
         dst_img=path_new+f'{split}/images/'
         json_src = path+f'{split}/annotations/{split}.json'
         json_dst=path_new+f'{split}/annotations/'
+        box_dst=path_new+f'{split}/boxes/'
         
         for src_img in image_paths:
             print('source',src_img)
@@ -185,6 +207,10 @@ def create_dataset(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/st
         for i, mask in enumerate(annotation_to_mask(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
             mask=(mask* 255).astype(np.uint8)
             cv2.imwrite(os.path.join(json_dst,f'{i+1}.png'),mask)
+        
+        for i, box in enumerate(annotation_to_box(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
+            box=(box* 255).astype(np.uint8)
+            cv2.imwrite(os.path.join(box_dst,f'{i+1}.png'),box)
 
 def prepare_data_stenosis(path='stenExp/datasets/arcade/stenosis/', copy_data=False):
     if copy_data:
@@ -192,31 +218,32 @@ def prepare_data_stenosis(path='stenExp/datasets/arcade/stenosis/', copy_data=Fa
     for split in ['train', 'test', 'val']:
         for image_path in sorted(glob(os.path.join(path,split,'images', '*.png'))):
             preprocess_inplace(image_path)
-            # file = os.path.basename(image_path)
-            # if int(os.path.splitext(file)[0])%50==0:
-            #     print(f'{split}/{file}')
 
 
 #https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
-def load_data(path='stenExp/datasets/arcade/stenosis/'):
-    def get_data(path, split):
+def load_data(path='stenExp/datasets/arcade/stenosis/', bbox=False):
+    def get_data(path, split, bbox=False):
         """returns:
                 images as a list of file paths
                 labels as a list of file paths """
 
         images = sorted(glob(os.path.join(path, split, "images", "*.png")))
         labels = sorted(glob(os.path.join(path, split, "annotations", "*.png")))
+
+        if bbox:
+            bboxes = sorted(glob(os.path.join(path, split, "boxes", "*.png")))
+            return images, labels, bboxes
         
         return images, labels
     
     """ Training data """
-    train_x, train_y = get_data(path, split='train')
+    train_x, train_y = get_data(path, split='train', bbox=bbox)
 
     """Validation data"""
-    valid_x, valid_y = get_data(path, split='val')
+    valid_x, valid_y = get_data(path, split='val', bbox=bbox)
 
     """Testing data"""
-    test_x, test_y = get_data(path, split='test')
+    test_x, test_y = get_data(path, split='test', bbox=bbox)
 
     return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
 
@@ -235,6 +262,7 @@ class ARCADE_DATASET(Dataset):
         """ Image """
         image = cv2.imread(self.images_path[index], cv2.IMREAD_COLOR)
         mask = cv2.imread(self.masks_path[index], cv2.IMREAD_GRAYSCALE)
+
 
         if self.transform is not None:
             augmentations = self.transform(image=image, mask=mask)
@@ -299,58 +327,5 @@ def check_labels(train_loader, valid_loader, zipped_test):
             break
 
 if __name__  == '__main__':
-    prepare_data_for_nnunet()
-
-# if __name__ =='__main__':
-#     #preprocess(copy_data=True)
-#     #annotation_to_mask('arcade/stenosis/train/annotations/train.json', split='train')
-
-#     (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_data(path='stenExp/datasets1/arcade/stenosis/')
-#     train_x, train_y = shuffling(train_x, train_y)
-
-#     data_str = f"Dataset Size:\nTrain: {len(train_x)} - Valid: {len(valid_x)} - Test: {len(test_x)}\n"
-#     print(data_str)
-
-#     import albumentations as A
-#     transform = A.Compose([
-#         A.Affine(scale=(0.7, 1.4), p=0.5),
-#         A.Rotate(limit=180, p=0.5),
-#         A.GaussNoise(std_range=(0.0, 0.32), p=0.5),
-#         A.GaussianBlur(blur_limit=3, sigma_limit=(0.71, 1), p=0.5)
-#         ])
-
-#     train_dataset = ARCADE_DATASET(train_x, train_y, size=(256,256), transform=transform)
-#     valid_dataset = ARCADE_DATASET(valid_x, valid_y, size=(256,256), transform=None)
-
-#     bs=8
-#     train_loader = DataLoader(
-#         dataset=train_dataset,
-#         batch_size=bs,
-#         shuffle=True,
-#         num_workers=2
-#     )
-
-#     valid_loader = DataLoader(
-#         dataset=valid_dataset,
-#         batch_size=bs,
-#         shuffle=False,
-#         num_workers=2
-#     )
-
-#     print(f'Data Loaded. Batch size = {bs}')
-
-#         # path = 'DEBUG2'
-#     # os.makedirs(path, exist_ok=True)
-#     # for i, arr in enumerate(train_y):
-#     #     if len(np.where(arr==1))>0:
-#     #         print(i,'yay')
-#     #     plt.imshow(arr)
-#     #     plt.savefig(os.path.join(f'{path}/{i}.png'))
-
-#     #     arr_cv = (arr * 255).astype(np.uint8)
-#     #     cv2.imwrite(os.path.join(path, f'{i}_cv2.png'), arr_cv)
-
-#     # #print(train_y)
-#     # import sys
-#     # sys.exit()
-        
+    #prepare_data_for_nnunet()
+    create_dataset()

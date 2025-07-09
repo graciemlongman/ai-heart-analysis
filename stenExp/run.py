@@ -17,7 +17,7 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='saumamba'
+    model_choice='umambaBot'
     optim_choice='Adam'
 
     """ Directories and log file """
@@ -91,7 +91,12 @@ if __name__ == "__main__":
     """ Model """
     print('loading model...')
     device = torch.device('cuda')
-    model = ModelZoo(choice=model_choice).to(device)
+    model = ModelZoo(choice=model_choice)
+    if model_choice == 'saumamba':
+        model.load_from()
+        model=model.cuda()
+    else:
+        model.to(device)
     if resume:
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 
