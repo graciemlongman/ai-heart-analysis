@@ -233,23 +233,21 @@ def load_data(path='stenExp/datasets/arcade/stenosis/', bbox=False):
         if bbox:
             bboxes = sorted(glob(os.path.join(path, split, "boxes", "*.png")))
             return images, labels, bboxes
-        
-        return images, labels
+        else:
+            return images, labels, None
     
-    """ Training data """
-    train_x, train_y = get_data(path, split='train', bbox=bbox)
+    train_x, train_y, train_b = get_data(path, split='train', bbox=bbox)
+    valid_x, valid_y, valid_b = get_data(path, split='val', bbox=bbox)
+    test_x, test_y, test_b = get_data(path, split='test', bbox=bbox)
 
-    """Validation data"""
-    valid_x, valid_y = get_data(path, split='val', bbox=bbox)
-
-    """Testing data"""
-    test_x, test_y = get_data(path, split='test', bbox=bbox)
-
-    return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
+    if bbox:
+        return [(train_x, train_y, train_b), (valid_x, valid_y, valid_b), (test_x, test_y, test_b)]
+    else:
+        return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
 
 #https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
 class ARCADE_DATASET(Dataset):
-    def __init__(self, images_path, masks_path, size, transform=None):
+    def __init__(self, images_path, masks_path, size, transform=None, bbox=False, boxes_path=None):
         super().__init__()
 
         self.images_path = images_path
@@ -257,18 +255,18 @@ class ARCADE_DATASET(Dataset):
         self.size = size
         self.transform = transform
         self.n_samples = len(images_path)
+        self.bbox = bbox
+        self.boxes_path = boxes_path
 
     def __getitem__(self, index):
         """ Image """
         image = cv2.imread(self.images_path[index], cv2.IMREAD_COLOR)
         mask = cv2.imread(self.masks_path[index], cv2.IMREAD_GRAYSCALE)
 
-
         if self.transform is not None:
             augmentations = self.transform(image=image, mask=mask)
             image = augmentations["image"]
             mask = augmentations["mask"]
-
 
         image = cv2.resize(image, self.size)
         image = np.transpose(image, (2, 0, 1))
@@ -278,19 +276,63 @@ class ARCADE_DATASET(Dataset):
         mask = np.expand_dims(mask, axis=0)
         mask = mask/255.0 
 
-        return image, mask
+        if self.bbox:
+            box = cv2.imread(self.boxes_path[index], cv2.IMREAD_GRAYSCALE)
+            if self.transform is not None:
+                augmentations = self.transform(box=box)
+                box = augmentations['box']
+            box = cv2.resize(box, self.size)
+            box = np.expand_dims(box, axis=0)
+            box=box/255.0
+            return image, mask, box
+        else:
+            return image, mask
 
     def __len__(self):
         return self.n_samples
 
+from sklearn.utils import shuffle
+from utils.utils import print_and_save
+def data_loader(train_log_path, bbox, size, transform, batch_size):
+    if bbox:
+        (train_x, train_y, train_b), (valid_x, valid_y, valid_b), (test_x, test_y, test_b) = load_data(bbox=True)
+        train_x, train_y, train_b = shuffle(train_x, train_y, train_b, random_state=42)
+        
+        train_dataset = ARCADE_DATASET(train_x, train_y, size, transform=transform, bbox=True, boxes_path=train_b)
+        valid_dataset = ARCADE_DATASET(valid_x, valid_y, size, transform=None, bbox=True, boxes_path=valid_b)
+    else:
+        print('Loading data and initialising dataset and data loader...')
+        (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_data()
+        train_x, train_y = shuffle(train_x, train_y, random_state=42)
+
+        train_dataset = ARCADE_DATASET(train_x, train_y, size, transform=transform)
+        valid_dataset = ARCADE_DATASET(valid_x, valid_y, size, transform=None)
+
+    data_str = f"Dataset Size:\nTrain: {len(train_x)} - Valid: {len(valid_x)} - Test: {len(test_x)}\n"
+    print_and_save(train_log_path, data_str)
+
+    train_loader = DataLoader(
+        dataset=train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=2
+    )
+
+    valid_loader = DataLoader(
+        dataset=valid_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=2
+    )
+
+    return train_loader, valid_loader
+
 def check_labels(train_loader, valid_loader, zipped_test):
-    #zipped_test = zip(test_x, test_y)
-    # PyTorch Example
     f='DEBUG_val'
     os.makedirs(f, exist_ok=True)
     for i, (images, masks) in enumerate(valid_loader):
-        # Show first sample in batch
-        plt.imshow(images[0][0], cmap='gray')  # assuming shape [B, C, H, W]
+
+        plt.imshow(images[0][0], cmap='gray')  
         plt.imshow(masks[0][0], alpha=0.4, cmap='Reds')
         plt.title('Batch Sample Overlay valid')
         plt.show()
@@ -301,8 +343,8 @@ def check_labels(train_loader, valid_loader, zipped_test):
     f='DEBUG_train'
     os.makedirs(f, exist_ok=True)
     for i, (images, masks) in enumerate(train_loader):
-        # Show first sample in batch
-        plt.imshow(images[0][0], cmap='gray')  # assuming shape [B, C, H, W]
+
+        plt.imshow(images[0][0], cmap='gray')
         plt.imshow(masks[0][0], alpha=0.4, cmap='Reds')
         plt.title('Batch Sample Overlay valid')
         plt.show()
@@ -316,9 +358,8 @@ def check_labels(train_loader, valid_loader, zipped_test):
     for i, (images, masks) in enumerate(zipped_test):
         image = cv2.imread(images, cv2.IMREAD_COLOR)
         mask = cv2.imread(masks, cv2.IMREAD_GRAYSCALE)
-        
-        # Show first sample in batch
-        plt.imshow(image, cmap='gray')  # assuming shape [B, C, H, W]
+
+        plt.imshow(image, cmap='gray')
         plt.imshow(mask, alpha=0.4, cmap='Reds')
         plt.title('Batch Sample Overlay valid')
         plt.show()

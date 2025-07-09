@@ -106,16 +106,16 @@ class Attention_block(nn.Module):
         return x*psi
 
 
-class BB_AttU_Net(nn.Module):
-    def __init__(self,img_ch=3,output_ch=1, BB_boxes=1, no_grad=False, comment=True):
-        super(BB_AttU_Net,self).__init__()
+class attBB_UNet(nn.Module):
+    def __init__(self,img_ch=3,output_ch=1, BB_boxes=1, no_grad=False, partition='train'):
+        super(attBB_Unet,self).__init__()
 
         if no_grad is True:
             no_grad_state = True
         else:
             no_grad_state = False
 
-        self.train = comment
+        self.train = True if partition == 'train' else False
         
         self.Maxpool = nn.MaxPool2d(kernel_size=2,stride=2)
 

@@ -17,88 +17,56 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='umambaBot'
+    model_choice='bbunet'
+    bbox=True #load bbox into data loader or not
     optim_choice='Adam'
+    resume=False
 
     """ Directories and log file """
     folder = f'{model_choice}/{optim_choice}'
-    resume=False
+    train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
+    checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
 
     create_dir(f"stenExp/model_runs/{folder}")
-    train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
     create_file(train_log_path)
-
-    """ Record Date & Time """
-    datetime_object = str(datetime.datetime.now())
-    print_and_save(train_log_path, datetime_object)
-    print("")
+    print_and_save(train_log_path, str(datetime.datetime.now()))
 
     """ Hyperparameters """
-    print('Initialising hyper parameters...')
     image_size = 256
     size = (image_size, image_size)
     batch_size = 8
     num_epochs = 500
     lr = 1e-4
     early_stopping_patience = 50
-    checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
-    path = "arcade/stenosis/"
 
     data_str = f"Image Size: {size}\nBatch Size: {batch_size}\nLR: {lr}\nEpochs: {num_epochs}\n"
     data_str += f"Early Stopping Patience: {early_stopping_patience}\n"
     print_and_save(train_log_path, data_str)
 
-    """ Dataset """
-    # print('Preprocessing dataset...')
-    # prepare_data_stenosis(copy_data=True)
-
-    print('Loading data and initialising dataset and data loader...')
-    (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_data()
-    train_x, train_y = shuffling(train_x, train_y)
-
-    data_str = f"Dataset Size:\nTrain: {len(train_x)} - Valid: {len(valid_x)} - Test: {len(test_x)}\n"
-    print_and_save(train_log_path, data_str)
-
-    """ Data augmentation: Transforms """
-    #StenUNet transforms
+    """ Data augmentation: StenUNet Transforms """
     transform = A.Compose([
         A.Affine(scale=(0.7, 1.4), p=0.5),
         A.Rotate(limit=180, p=0.5),
         A.GaussNoise(std_range=(0.0, 0.32), p=0.5),
         A.GaussianBlur(blur_limit=3, sigma_limit=(0.71, 1), p=0.5)
         ])
+    
+    """ Dataset """
+    # print('Preprocessing dataset...')
+    # prepare_data_stenosis(copy_data=True)
 
-    """ Dataset and loader """
-    train_dataset = ARCADE_DATASET(train_x, train_y, size, transform=transform)
-    valid_dataset = ARCADE_DATASET(valid_x, valid_y, size, transform=None)
-
-    train_loader = DataLoader(
-        dataset=train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=2
-    )
-
-    valid_loader = DataLoader(
-        dataset=valid_dataset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=2
-    )
+    train_loader, valid_loader = data_loader(train_log_path, bbox, size, transform, batch_size)
 
     #check_labels(train_loader, valid_loader, zip(test_x,test_y))
 
     """ Model """
-    print('loading model...')
     device = torch.device('cuda')
-    model = ModelZoo(choice=model_choice)
+    model = ModelZoo(choice=model_choice, partition='train')
     if model_choice == 'saumamba':
         model.load_from()
-        model=model.cuda()
-    else:
-        model.to(device)
     if resume:
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    model.to(device)
 
     optimizer = OptZoo(choice=optim_choice, model=model, lr=lr)
 

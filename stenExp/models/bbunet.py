@@ -67,14 +67,14 @@ class BB_Unet(Module):
         Networks for Biomedical Image Segmentation
         ArXiv link: https://arxiv.org/abs/1505.04597
     """
-    def __init__(self, drop_rate=0.6, bn_momentum=0.1, no_grad=False, BB_boxes = 1, comment=True):
+    def __init__(self, drop_rate=0.6, bn_momentum=0.1, no_grad=False, BB_boxes = 1, partition='train'):
         super(BB_Unet, self).__init__()
         if no_grad is True:
             no_grad_state = True
         else:
             no_grad_state = False
 
-        self.train = comment
+        self.train = True if partition == 'train' else False
         
         #Downsampling path
         self.conv1 = DownConv(1, 64, drop_rate, bn_momentum)

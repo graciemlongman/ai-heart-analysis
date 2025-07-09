@@ -172,24 +172,29 @@ def OptZoo(choice, model, lr):
 
 try:
     from models.resunetplusplus import build_resunetplusplus
+    from models.transunet import TransUNet
+    from models.saumamba.vmunet import VMUNet
+
     from models.aunet import AttU_Net
     from models.aunet1 import AttU_Net1 #deformable
     from models.aunet2 import AttU_Net2 #aspp
     from models.aunet3 import AttU_Net3 #assp + bottleneck
     from models.aunet4 import AttU_Net4 #bottleneck
+
     from models.attUMambaEnc import AttUMambaEnc, InitWeights_He #aunet dec
     from models.attUMambaBot import AttUMambaBot
     from models.attUMambaEnc_2 import UMambaEnc_2 #umamba decoder
     from models.attUMambaBot_2 import UMambaBot_2
     from models.umambaBot import UMambaBot
-    from models.transunet import TransUNet
-    from models.saumamba.vmunet import VMUNet
+
+    from models.bbunet import BB_Unet
+    from models.bb_aunet import attBB_UNet
 except:
     pass
 from torch import nn
 import torchvision
 
-def ModelZoo(choice):
+def ModelZoo(choice, partition=None):
     if choice == 'resunetplusplus':
         return build_resunetplusplus()
     elif choice == 'deeplabv3resnet101':
@@ -223,6 +228,8 @@ def ModelZoo(choice):
         return AttU_Net3()
     elif choice == 'aunet4':
         return AttU_Net4()
+    elif choice == 'bbunet':
+        return BB_Unet(partition=partition)
     elif choice == 'attumambaEnc':
         model = AttUMambaEnc(input_size=(256,256),
                  n_stages=7,
