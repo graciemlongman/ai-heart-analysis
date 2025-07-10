@@ -34,7 +34,7 @@ def write_json(path):
             "background": 0,
             "stenosis": 1,
             }, 
-            "numTraining": 1200, 
+            "numTraining": 1000, 
             "file_ending": ".nii.gz"
             }
     with open(f'{path}/dataset.json', 'w', encoding='utf-8') as file:
@@ -60,7 +60,7 @@ def make_directories(path_new, version='torch'):
         if os.path.exists(path_new)==False:
             os.makedirs(path_new)
             write_json(path_new)
-            for folder in ['imagesTr', 'labelsTr', 'imagesTs', 'labelsTs']:
+            for folder in ['imagesTr', 'labelsTr', 'imagesTs', 'labelsTs', 'images_test', 'labels_test']:
                 os.makedirs(f'{path_new}/{folder}')
     else:
         raise ValueError(f"Dataset version '{version}' is not supported.")
@@ -80,7 +80,7 @@ def load_annotations(dataset_dir):
 import nibabel as nib
 import numpy as np
 from PIL import Image
-def prepare_data_for_nnunet(path='arcade/stenosis/', path_new='Dataset111_ArcadeXCA/'):
+def prepare_data_for_nnunet(path='arcade/stenosis/', path_new='Dataset112_ArcadeXCA/'):
     make_directories(path_new, version='nnunet')
 
     for split in ['train', 'test', 'val']:
@@ -89,6 +89,17 @@ def prepare_data_for_nnunet(path='arcade/stenosis/', path_new='Dataset111_Arcade
 
         dst_img = f'{path_new}imagesTs' if split == 'test' else f'{path_new}imagesTr'
         dst_msk = f'{path_new}labelsTs' if split == 'test' else f'{path_new}labelsTr'
+
+        # nnUnet uses the test set for 5 fold cross validation during training hence relabelling the val set as ts to be used in training
+        if split =='train':
+            dst_img = f'{path_new}imagesTr' 
+            dst_msk = f'{path_new}labelsTr'
+        elif split == 'test':
+            dst_img = f'{path_new}images_test' 
+            dst_msk = f'{path_new}labels_test'
+        elif split == 'val':
+            dst_img = f'{path_new}imagesTs' 
+            dst_msk = f'{path_new}labelsTs'
 
         #copy images and save as .nii.gz
         print('Moving images', split)
@@ -369,5 +380,5 @@ def check_labels(train_loader, valid_loader, zipped_test):
             break
 
 if __name__  == '__main__':
-    #prepare_data_for_nnunet()
-    create_dataset()
+    prepare_data_for_nnunet()
+    #create_dataset()
