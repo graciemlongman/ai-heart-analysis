@@ -282,7 +282,8 @@ class ARCADE_DATASET(Dataset):
 
         if self.bbox:
             box = cv2.resize(box, self.size)
-            box = np.expand_dims(box, axis=0)
+            if box.ndim == 2:
+                box = np.expand_dims(box, axis=0)
             box=box/255.0
             return image, mask, box
         else:
@@ -353,7 +354,6 @@ def check_labels(train_loader, valid_loader, zipped_test):
         if i==20:
             break
 
-        # PyTorch Example
     f='DEBUG_test'
     os.makedirs(f, exist_ok=True)
     for i, (images, masks) in enumerate(zipped_test):
@@ -362,6 +362,31 @@ def check_labels(train_loader, valid_loader, zipped_test):
 
         plt.imshow(image, cmap='gray')
         plt.imshow(mask, alpha=0.4, cmap='Reds')
+        plt.title('Batch Sample Overlay valid')
+        plt.show()
+        plt.savefig(os.path.join(f'{f}/{i}.png'))
+        if i==20:
+            break
+
+def check_boxes(train_loader, valid_loader):
+    f='DEBUG_val'
+    os.makedirs(f, exist_ok=True)
+    for i, (images, masks, b) in enumerate(valid_loader):
+
+        plt.imshow(images[0][0], cmap='gray')  
+        plt.imshow(b[0], alpha=0.4, cmap='Reds')
+        plt.title('Batch Sample Overlay valid')
+        plt.show()
+        plt.savefig(os.path.join(f'{f}/{i}.png'))
+        if i==20:
+            break
+
+    f='DEBUG_train'
+    os.makedirs(f, exist_ok=True)
+    for i, (images, masks, b) in enumerate(train_loader):
+
+        plt.imshow(images[0][0], cmap='gray')
+        plt.imshow(b[0], alpha=0.4, cmap='Reds')
         plt.title('Batch Sample Overlay valid')
         plt.show()
         plt.savefig(os.path.join(f'{f}/{i}.png'))

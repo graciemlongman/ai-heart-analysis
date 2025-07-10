@@ -18,13 +18,13 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='umambaBot' #'bbunet'
-    bbox=False#True #load bbox into data loader or not
-    optim_choice='RMSprop' #'Adam'
+    model_choice='bbunet'
+    bbox=True #load bbox into data loader or not
+    optim_choice='Adam'
     resume=False
 
     """ Directories and log file """
-    folder = f'{model_choice}/{optim_choice}'
+    folder = f'bbunet_bb_in_x3_only/{optim_choice}'
     train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
     checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
 

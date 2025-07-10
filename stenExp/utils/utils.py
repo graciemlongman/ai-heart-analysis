@@ -189,7 +189,8 @@ try:
 
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
-except:
+except Exception as e:
+    print(f"[IMPORT ERROR] {e}")
     pass
 from torch import nn
 import torchvision
@@ -230,6 +231,8 @@ def ModelZoo(choice, partition=None):
         return AttU_Net4()
     elif choice == 'bbunet':
         return BB_Unet(partition=partition)
+    elif choice == 'bbaunet':
+        return attBB_UNet(partition=partition)
     elif choice == 'attumambaEnc':
         model = AttUMambaEnc(input_size=(256,256),
                  n_stages=7,

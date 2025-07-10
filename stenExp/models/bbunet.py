@@ -67,12 +67,8 @@ class BB_Unet(Module):
         Networks for Biomedical Image Segmentation
         ArXiv link: https://arxiv.org/abs/1505.04597
     """
-    def __init__(self, drop_rate=0.6, bn_momentum=0.1, no_grad=False, BB_boxes = 1, partition='train'):
+    def __init__(self, drop_rate=0.6, bn_momentum=0.1, no_grad_state=False, BB_boxes = 1, partition='train'):
         super(BB_Unet, self).__init__()
-        if no_grad is True:
-            no_grad_state = True
-        else:
-            no_grad_state = False
 
         self.train_flag = True if partition == 'train' else False
         
@@ -117,8 +113,8 @@ class BB_Unet(Module):
         # bbox encoder
         if self.train_flag: #i.e. dont have bboxes when we run inference
             x3 = x3*self.b1(bb)
-            x2 = x2*self.b2(bb)
-            x1 = x1*self.b3(bb)
+            #x2 = x2*self.b2(bb)
+            #x1 = x1*self.b3(bb)
 
         # Up-sampling
         u1 = self.up1(x4, x3)
