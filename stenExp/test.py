@@ -31,37 +31,41 @@ def process_mask(y_pred):
     y_pred = np.concatenate([y_pred, y_pred, y_pred], axis=2)
     return y_pred
 
-def evaluate(model, save_path, results_path, test_x, test_y, size, pp_threshold=50):
+def evaluate(model, save_path, results_path, test_x, test_y, test_b, size, bbox, pp_threshold=50):
     metrics_score, post_metrics_score = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     time_taken = []
 
-    for i, (x, y) in tqdm(enumerate(zip(test_x, test_y)), total=len(test_x)):
+    for i, (x, y, b) in tqdm(enumerate(zip(test_x, test_y, test_b)), total=len(test_x)):
         name = x.split("/")
         name = f"{name[-3]}_{name[-1]}"
         
         """ Image """
-        image = cv2.imread(x, cv2.IMREAD_COLOR)
-        image = cv2.resize(image, size)
+        image = cv2.resize(cv2.imread(x, cv2.IMREAD_COLOR), size)
         save_img = image
         
         image = np.transpose(image, (2, 0, 1))
-        image = np.expand_dims(image, axis=0) 
-        image = image/255.0
+        image = np.expand_dims(image, axis=0)/255.0
+        image = torch.from_numpy(image.astype(np.float32)).to(device)
 
-        image = image.astype(np.float32)
-        image = torch.from_numpy(image)
-        image = image.to(device)
-
-    #     """ Mask """
-        mask = cv2.imread(y, cv2.IMREAD_GRAYSCALE) 
-        mask = cv2.resize(mask, size)
+        """ Mask """
+        mask = cv2.resize(cv2.imread(y, cv2.IMREAD_GRAYSCALE) , size)
         save_mask = np.expand_dims(mask, axis=-1)
         save_mask = np.concatenate([save_mask, save_mask, save_mask], axis=2)
+
+        """ Box """
+        box = cv2.resize(cv2.imread(b, cv2.IMREAD_GRAYSCALE), size)
+        #box = np.transpose(box, (2,0,1))
+        box = np.expand_dims(box, axis=0)/255.0
+        box = torch.from_numpy(box.astype(np.float32)).to(device)
 
         with torch.no_grad():
             """ FPS calculation """
             start_time = time.time()
-            y_pred = model(image)
+            if bbox:
+                y_pred = model(image, box)
+            else:
+                y_pred = model(image)
+
             if isinstance(y_pred, collections.OrderedDict):
                 y_pred=y_pred['out']
             y_pred = torch.sigmoid(y_pred)
@@ -105,23 +109,15 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'umambaBot'
+    model_choice = 'bbunet'
     optim_choice = 'Adam'
+    bbox=True
 
     """ Directories and chkpt path """
-    folder =f'{model_choice}/{optim_choice}'
+    folder =f'bbunet_bb_in_x3_only/{optim_choice}'
     checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
     save_path = f"stenExp/model_runs/{folder}/results/"
-
-    """ Load the checkpoint """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = ModelZoo(choice=model_choice).to(device)
-    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
-    model.eval()
-
-    """ Test dataset """
-    # only need test here
-    (train_x, train_y), (valid_x, valid_y), (test_x, test_y) = load_data()
+    results_path = f'{save_path}results.txt'
 
     for item in ["mask", "joint", "procd_mask"]:
         if not os.path.exists(f"{save_path}/{item}"):
@@ -129,8 +125,17 @@ if __name__ == "__main__":
         else:
             file_exists_print_and_exit()
 
-    results_path = f'{save_path}results.txt'
     create_file(results_path)
 
+
+    """ Load the checkpoint """
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = ModelZoo(choice=model_choice, partition='train').to(device)
+    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    model.eval()
+
+    """ Test dataset """
+    (train_x, train_y, train_b), (valid_x, valid_y, valid_b), (test_x, test_y, test_b) = load_data(bbox=True)
+
     size = (256, 256)
-    evaluate(model, save_path, results_path, test_x, test_y, size)
+    evaluate(model, save_path, results_path, test_x, test_y, test_b, size, bbox)

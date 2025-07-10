@@ -71,20 +71,20 @@ def calc_metrics(images, masks, preds, size, save_path, results_path):
     save_test_results_to_file(results_path, metrics, post_metrics)
 
 if __name__ == '__main__':
-    input_folder = 'xLSTM-UNet-PyTorch/data/nnUNet_results/Dataset111_ArcadeXCA/inference/'
-    out_preds = 'stenExp/model_runs/xLSTM-UNet/two/preds/'
+    input_folder = 'U-Mamba/data/nnUNet_results/Dataset111_ArcadeXCA/nnUNetTrainerattUMambaBot__nnUNetPlans__2d/inference/'
+    out_preds = 'stenExp/model_runs/nnU-attMambaBot_2/one/preds/'
 
-    labels_folder = 'xLSTM-UNet-PyTorch/data/nnUNet_raw/Dataset111_ArcadeXCA/labelsTs/'
-    out_masks = 'stenExp/model_runs/xLSTM-UNet/two/labelsTs/'
+    labels_folder = 'U-Mamba/data/nnUNet_raw/Dataset111_ArcadeXCA/labelsTs/'
+    out_masks = 'stenExp/model_runs/nnU-attMambaBot_2/one/labelsTs/'
 
-    input_images_folder = 'xLSTM-UNet-PyTorch/data/nnUNet_raw/Dataset111_ArcadeXCA/imagesTs/'
-    out_images = 'stenExp/model_runs/xLSTM-UNet/two/imagesTs/'
+    input_images_folder = 'U-Mamba/data/nnUNet_raw/Dataset111_ArcadeXCA/imagesTs/'
+    out_images = 'stenExp/model_runs/nnU-attMambaBot_2/one/imagesTs/'
 
     nifti2png(input_folder, out_preds)
     nifti2png(labels_folder, out_masks)
     nifti2png(input_images_folder, out_images)
 
-    save_path = 'stenExp/model_runs/xLSTM-UNet/two/results/'
-    results_path = 'stenExp/model_runs/xLSTM-UNet/two/results/results.txt'
+    save_path = 'stenExp/model_runs/nnU-attMambaBot_2/one/results/'
+    results_path = 'stenExp/model_runs/nnU-attMambaBot_2/one/results/results.txt'
     size=(256,256)
     calc_metrics(out_images, out_masks, out_preds, size, save_path, results_path)

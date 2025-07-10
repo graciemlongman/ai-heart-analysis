@@ -2,6 +2,8 @@
 ## TAKEN FROM https://github.com/LeeJunHyun/Image_Segmentation/blob/master/network.py
 
 # Add bounding box informed operations to the skip connection
+# Used AttUNet backbone, including attention gates
+
 
 import torch
 import torch.nn as nn
@@ -64,15 +66,16 @@ class up_conv(nn.Module):
 class BBConv(nn.Module):
     def __init__(self, in_feat, out_feat, pool_ratio, no_grad_state):
         super(BBConv, self).__init__()
-        self.mp = nn.MaxPool2d(pool_ratio)
-        self.conv1 = nn.Conv2d(in_feat, out_feat, kernel_size=3, padding=1)
-        if no_grad_state is True:
-            self.conv1.requires_grad = False
-        else:
-            self.conv1.requires_grad = True
+        
+        self.bb_conv = nn.Sequential(
+            nn.MaxPool2d(pool_ratio),
+            nn.Conv2d(in_feat, out_feat, kernel_size=3, padding=1),
+            #nn.MaxPool2d(pool_ratio),
+            #nn.Conv2d(out_feat, out_feat, kernel_size=3, padding=1)
+        )
+
     def forward(self, x):
-        x = self.mp(x)
-        x = self.conv1(x)
+        x = self.bb_conv(x)
         x = F.sigmoid(x)
         return x
         
@@ -108,14 +111,14 @@ class Attention_block(nn.Module):
 
 class attBB_UNet(nn.Module):
     def __init__(self,img_ch=3,output_ch=1, BB_boxes=1, no_grad=False, partition='train'):
-        super(attBB_Unet,self).__init__()
+        super(attBB_UNet,self).__init__()
 
         if no_grad is True:
             no_grad_state = True
         else:
             no_grad_state = False
 
-        self.train = True if partition == 'train' else False
+        self.train_flag = True if partition == 'train' else False
         
         self.Maxpool = nn.MaxPool2d(kernel_size=2,stride=2)
 
@@ -126,7 +129,7 @@ class attBB_UNet(nn.Module):
         self.Conv5 = conv_block(ch_in=512,ch_out=1024)
 
         self.Up5 = up_conv(ch_in=1024,ch_out=512)
-        self.b5 = BBConv(BB_boxes, 512, 4, no_grad_state)
+        self.b5 = BBConv(BB_boxes, 512, 8, no_grad_state)
         self.Att5 = Attention_block(F_g=512,F_l=512,F_int=256)
         self.Up_conv5 = conv_block(ch_in=1024, ch_out=512)
 
@@ -167,7 +170,7 @@ class attBB_UNet(nn.Module):
         # decoding + concat path
         # bbox + attn op
 
-        if self.train:
+        if self.train_flag:
             x4= self.b5(bb)*x4
             x3 = self.b4(bb)*x3
             x2 = self.b3(bb)*x2
@@ -196,3 +199,6 @@ class attBB_UNet(nn.Module):
         d1 = self.Conv_1x1(d2)
 
         return d1
+
+if __name__ == '__main__':
+    model = attBB_UNet()
