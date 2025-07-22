@@ -189,6 +189,9 @@ try:
 
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
+
+    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, nomod, load_weights
+
 except Exception as e:
     print(f"[IMPORT ERROR] {e}")
     pass
@@ -203,6 +206,12 @@ def ModelZoo(choice, partition=None):
                                                 progress=True, aux_loss=None)
         model.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
         return model
+    elif choice == 'deeplabv3resnet101_bb':
+        return DeepLabV3_BB()
+    elif choice == 'deeplabv3resnet101_se':
+        return load_weights(DeepLabV3_SE())
+    elif choice == 'deeplabv3resnet101_nomod':
+        return load_weights(nomod())
     elif choice == 'transunet':
         return TransUNet(img_dim=256,
                           in_channels=3,

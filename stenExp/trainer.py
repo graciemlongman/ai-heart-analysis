@@ -48,7 +48,8 @@ def train(model, loader, optimizer, loss_fn, device, bbox):
             if isinstance(y_pred, collections.OrderedDict):
                 y_pred=y_pred['out']
             loss = loss_fn(y_pred, y)
-            loss.backward()
+            with torch.autograd.set_detect_anomaly(True):
+                loss.backward()
             optimizer.step()
             epoch_loss += loss.item()
 

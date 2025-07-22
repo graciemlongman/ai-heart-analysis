@@ -18,13 +18,13 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='bbunet'
-    bbox=True #load bbox into data loader or not
+    model_choice='deeplabv3resnet101_nomod'
+    bbox=False #load bbox into data loader or not
     optim_choice='Adam'
     resume=False
 
     """ Directories and log file """
-    folder = f'bbunet_bb_in_x3_only/{optim_choice}'
+    folder = f'{model_choice}/{optim_choice}'
     train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
     checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
 
@@ -89,6 +89,7 @@ if __name__ == "__main__":
     for epoch in range(num_epochs):
         start_time = time.time()
 
+        torch.autograd.set_detect_anomaly(True)
         train_loss, train_metrics = train(model, train_loader, optimizer, loss_fn, device, bbox)
         valid_loss, valid_metrics = evaluate(model, valid_loader, loss_fn, device, bbox)
         scheduler.step(valid_loss)
