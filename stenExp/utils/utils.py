@@ -101,7 +101,6 @@ def calculate_metrics(y_true, y_pred, y_true_proc=True, y_pred_proc=True,size=No
     y_true = y_true.reshape(-1)
     y_pred = y_pred.reshape(-1)
 
-
     ## Score
     score_jaccard = jac_score(y_true, y_pred)
     score_f1 = dice_score(y_true, y_pred)
@@ -172,7 +171,7 @@ def OptZoo(choice, model, lr):
 
 try:
     from models.resunetplusplus import build_resunetplusplus
-    from models.transunet import TransUNet
+    #from models.transunet.transunet import TransUNet
     from models.saumamba.vmunet import VMUNet
 
     from models.aunet import AttU_Net
@@ -190,7 +189,7 @@ try:
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
 
-    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, nomod, load_weights
+    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, nomod, _load_weights
 
 except Exception as e:
     print(f"[IMPORT ERROR] {e}")
@@ -207,11 +206,11 @@ def ModelZoo(choice, partition=None):
         model.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
         return model
     elif choice == 'deeplabv3resnet101_bb':
-        return DeepLabV3_BB()
+        return _load_weights(DeepLabV3_BB())
     elif choice == 'deeplabv3resnet101_se':
-        return load_weights(DeepLabV3_SE())
+        return _load_weights(DeepLabV3_SE())
     elif choice == 'deeplabv3resnet101_nomod':
-        return load_weights(nomod())
+        return _load_weights(nomod())
     elif choice == 'transunet':
         return TransUNet(img_dim=256,
                           in_channels=3,
@@ -221,13 +220,26 @@ def ModelZoo(choice, partition=None):
                           block_num=8,
                           patch_dim=16,
                           class_num=1)
+    elif choice == 'transunet_weights':
+        model = TransUNet(img_dim=256,
+                          in_channels=3,
+                          out_channels=128,
+                          head_num=4,
+                          mlp_dim=512,
+                          block_num=8,
+                          patch_dim=16,
+                          class_num=1)
+        model.load_from(weights=np.load('stenExp/models/transunet/pretrained_weights/weights.pt'))
+        return model
     elif choice == 'saumamba':
-        return VMUNet(num_classes=1,
+        model = VMUNet(num_classes=1,
                         input_channels=3,
                         depths=[2,2,2,2],
                         depths_decoder=[2,2,2,1],
                         drop_path_rate=0.2,
                         load_ckpt_path='stenExp/models/saumamba/pretrained_weights/vmamba_small_e238_ema.pth')
+        model.load_from()
+        return model
     elif choice == 'attentionunet':
         return AttU_Net()
     elif choice == 'aunet1':

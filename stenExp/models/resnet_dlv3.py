@@ -27,10 +27,11 @@ class Squeeze_Excitation(nn.Module):
         return x
 
 class SE_block(Bottleneck): #SE-Pre from the paper
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
-        super().__init__(inplanes, planes, stride, downsample)
+    def __init__(self, inplanes, planes, stride=1, dilation=1, downsample=None):
+        super().__init__(inplanes, planes, stride, downsample, dilation=dilation)
 
         self.SE_block = Squeeze_Excitation(inplanes)
+        self.conv3 = nn.Conv2d(self.conv2.out_channels, self.conv2.out_channels*self.expansion, kernel_size=3, stride=1, padding=dilation, dilation=dilation)
 
     def forward(self, x):
         
@@ -53,13 +54,14 @@ class SE_block(Bottleneck): #SE-Pre from the paper
 
         return x3
     
-
+import numpy as np
 class BB_block(Bottleneck):
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
-        super().__init__(inplanes, planes, stride, downsample)
+    def __init__(self, inplanes, planes, stride=1, downsample=None, dilation=1):
+        super().__init__(inplanes, planes, stride, downsample, dilation=dilation)
 
         self.BBconv = nn.Conv2d(3, self.conv2.out_channels, kernel_size=3, stride=1, padding=1)
-        
+        self.conv3 = nn.Conv2d(self.conv2.out_channels, self.conv2.out_channels*self.expansion, kernel_size=3, stride=1, padding=dilation, dilation=dilation)
+
     def forward(self, x, b):
         x1 = self.conv1(x)
         x1 = self.bn1(x1)
@@ -68,11 +70,15 @@ class BB_block(Bottleneck):
         x2 = self.conv2(x1)
         x2 = self.bn2(x2)
 
+
+        blank0 = torch.zeros((b.shape[0],1,256,256)).to(torch.device('cuda'))
+        blank1 = torch.ones((b.shape[0],1,256,256)).to(torch.device('cuda'))
+        b = torch.cat((b,blank0,blank1), 1)
+
         b = F.interpolate(b, size=x2.shape[2:], mode='nearest')
         b = self.BBconv(b)
         x2 = b + x2
         x2 = self.relu(x2)
-
 
         x3 = self.conv3(x2)
         x3 = self.bn3(x3)
@@ -82,17 +88,12 @@ class BB_block(Bottleneck):
         x3=self.relu(x3)
 
         return x3
-
-from torchvision.models.resnet import ResNet
-class resnet(ResNet):
-    def __init__(self):
-        super().__init__(block=Bottleneck, layers=[3,4,23,3])
-
-
+    
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=1):
         super(ResNet, self).__init__()
         self.in_channels = 64
+        self.dilation=1
 
         # Initial convolution and max pooling layers
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
@@ -103,8 +104,8 @@ class ResNet(nn.Module):
         # Define the layers dynamically based on the input configuration
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=True)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=True)
 
         # Final fully connected layer
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
@@ -121,15 +122,24 @@ class ResNet(nn.Module):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
 
-    def _make_layer(self, block, out_channels, blocks, stride=1):
+    def _make_layer(self, block, out_channels, blocks, stride=1, dilate=False):
+        previous_dilation = self.dilation
+        if dilate:
+            self.dilation *=stride
+            stride=1
+        
         downsample = None
         if stride != 1 or self.in_channels != out_channels * block.expansion:
             downsample = nn.Sequential(
                 nn.Conv2d(self.in_channels, out_channels * block.expansion, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(out_channels * block.expansion)
             )
-
-        layers = [block(self.in_channels, out_channels, stride, downsample)]
+        
+        layers = [block(inplanes=self.in_channels,
+                        planes=out_channels,
+                        stride=stride,
+                        downsample=downsample,
+                        dilation=previous_dilation)]
         self.in_channels = out_channels * block.expansion
         for _ in range(1, blocks):
             layers.append(block(self.in_channels, out_channels))
@@ -205,7 +215,6 @@ class nomod(DeepLabV3):
 
         self.backbone = backbone
         self.classifier = classifier
-        self.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
 
     def forward(self, x, b=None):
         input_shape = x.shape[-2:]
@@ -215,9 +224,8 @@ class nomod(DeepLabV3):
 
         x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
         return x
- 
     
-def load_weights(model, pretrained_model=None):
+def _load_weights(model, pretrained_model=None):
     pretrained_model = torchvision.models.segmentation.deeplabv3_resnet101(weights='DEFAULT', 
                                                 progress=True, aux_loss=None)
     pretrained_model.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
@@ -239,15 +247,9 @@ def load_weights(model, pretrained_model=None):
 
 if __name__ == '__main__': 
     
-    model = load_weights(DeepLabV3_BB())
-    # pretrained_model = torchvision.models.segmentation.deeplabv3_resnet101(weights='DEFAULT', 
-    #                                             progress=True, aux_loss=None)
-    # pretrained_model.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
-    # model.load_state_dict(pretrained_model.state_dict())
-    #print(model)
-
-    x = torch.randn(8, 3, 224, 224)
-    b = torch.randn(8, 3, 224, 224)
+    model = _load_weights(DeepLabV3_BB())
+    x = torch.randn(8, 3, 256, 256)
+    b = torch.randn(8, 1, 256, 256)
 
     with torch.no_grad():
         output = model(x,b)

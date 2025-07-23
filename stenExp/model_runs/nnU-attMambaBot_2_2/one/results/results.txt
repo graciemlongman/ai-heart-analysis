@@ -2,3 +2,4 @@ Jaccard: 0.4797 - F1: 0.6238 - Recall: 0.6334 - Precision: 0.6910 - Acc: 0.9927 
 
 Jaccard: 0.4893 - F1: 0.6317 - Recall: 0.6747 - Precision: 0.6644 - Acc: 0.9925 - F2: 0.6457 - HD: 3.5133 
 
+training interruption 

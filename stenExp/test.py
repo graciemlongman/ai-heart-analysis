@@ -110,9 +110,9 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'deeplabv3resnet101_nomod'
-    optim_choice = 'Adam'
-    bbox=False
+    model_choice = 'deeplabv3resnet101_bb'
+    optim_choice = 'RMSprop'
+    bbox=True
 
     """ Directories and chkpt path """
     folder =f'{model_choice}/{optim_choice}'
