@@ -1,26 +1,23 @@
 
 ### https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
 
-import os, sys
 import time
 import datetime
 import albumentations as A
 import torch
-from torch.utils.data import DataLoader
 from utils.utils import *
 from utils.metrics import DiceBCELoss
 from preparedata import *
 from trainer import *
-from models.aunet import AttU_Net
 
 if __name__ == "__main__":
     """ Seeding """
     seeding(42)
 
     """ Vars """
-    model_choice='deeplabv3resnet101_nomod'
-    bbox=False #load bbox into data loader or not
-    optim_choice='Adam'
+    model_choice='deeplabv3resnet101_se'
+    bbox=False
+    optim_choice='RMSprop'
     resume=False
 
     """ Directories and log file """
@@ -64,6 +61,8 @@ if __name__ == "__main__":
     model = ModelZoo(choice=model_choice, partition='train')
     if model_choice == 'saumamba':
         model.load_from()
+    if model_choice == 'transunet':
+        model.load_from(weights=np.load('stenExp/models/transunet/pretrained_weights/weights.pt'))
 
     device = torch.device('cuda')
     model.to(device)
