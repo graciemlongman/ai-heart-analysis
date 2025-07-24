@@ -55,7 +55,7 @@ def evaluate(model, save_path, results_path, test_x, test_y, test_b, size, bbox,
         """ Box """
         box = cv2.resize(cv2.imread(b, cv2.IMREAD_GRAYSCALE), size)
         box = np.expand_dims(box, axis=0)/255.0
-        box = np.expand_dims(box, axis=0)
+        box = np.expand_dims(box, axis=0) # for rn101
         box = torch.from_numpy(box.astype(np.float32)).to(device)
         #print(box.shape)
 
@@ -110,9 +110,9 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'deeplabv3resnet101_bb'
-    optim_choice = 'RMSprop'
-    bbox=True
+    model_choice = 'umambaEnc'
+    optim_choice = 'Adam'
+    bbox=False
 
     """ Directories and chkpt path """
     folder =f'{model_choice}/{optim_choice}'

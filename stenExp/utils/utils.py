@@ -185,11 +185,12 @@ try:
     from models.attUMambaEnc_2 import UMambaEnc_2 #umamba decoder
     from models.attUMambaBot_2 import UMambaBot_2
     from models.umambaBot import UMambaBot
+    from models.umambaEnc import UMambaEnc
 
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
 
-    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, nomod, _load_weights
+    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, DeepLabV3_DF, nomod, _load_weights
 
 except Exception as e:
     print(f"[IMPORT ERROR] {e}")
@@ -209,6 +210,8 @@ def ModelZoo(choice, partition=None):
         return _load_weights(DeepLabV3_BB())
     elif choice == 'deeplabv3resnet101_se':
         return _load_weights(DeepLabV3_SE())
+    elif choice == 'deeplabv3resnet101_df':
+        return _load_weights(DeepLabV3_DF())
     elif choice == 'deeplabv3resnet101_nomod':
         return _load_weights(nomod())
     elif choice == 'transunet':
@@ -288,6 +291,14 @@ def ModelZoo(choice, partition=None):
         return model.apply(InitWeights_He(1e-2))
     elif choice == 'umambaBot':
         model = UMambaBot(input_channels=3, n_stages=7, features_per_stage=(32, 64, 128, 256, 512, 512, 512),
+                              conv_op=nn.Conv2d, kernel_sizes=3, strides=(1, 2, 2, 2, 2, 2, 2),
+                              n_conv_per_stage=[1, 3, 4, 6, 6, 6, 6], num_classes=1,
+                              n_conv_per_stage_decoder=[1, 1, 1, 1, 1, 1],
+                              conv_bias=True, norm_op=nn.InstanceNorm2d, norm_op_kwargs={},
+                              nonlin=nn.LeakyReLU, nonlin_kwargs={'inplace': True}, deep_supervision=False)
+        return model.apply(InitWeights_He(1e-2))
+    elif choice == 'umambaEnc':
+        model = UMambaEnc(input_size=(256,256), input_channels=3, n_stages=7, features_per_stage=(32, 64, 128, 256, 512, 512, 512),
                               conv_op=nn.Conv2d, kernel_sizes=3, strides=(1, 2, 2, 2, 2, 2, 2),
                               n_conv_per_stage=[1, 3, 4, 6, 6, 6, 6], num_classes=1,
                               n_conv_per_stage_decoder=[1, 1, 1, 1, 1, 1],
