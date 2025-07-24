@@ -12,6 +12,7 @@ def nifti2png(input_folder, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     else:
+        #print(output_folder)
         file_exists_print_and_exit()
 
     for file in os.listdir(input_folder):
@@ -71,20 +72,20 @@ def calc_metrics(images, masks, preds, size, save_path, results_path):
     save_test_results_to_file(results_path, metrics, post_metrics)
 
 if __name__ == '__main__':
-    input_folder = 'U-Mamba/data/nnUNet_results/Dataset112_ArcadeXCA/nnUNetTrainerUMambaBot__nnUNetPlans__2d/inference/'
-    out_preds = 'stenExp/model_runs/nnU-MambaBot/one/preds/'
+    input_folder = 'LKM-UNet/data/nnUNet_results/Dataset112_ArcadeXCA/nnUNetTrainerLKMUNet__nnUNetPlans__2d/inference/'
+    out_preds = 'stenExp/model_runs/LKM-UNet/two/preds/'
 
-    labels_folder = 'U-Mamba/data/nnUNet_raw/Dataset112_ArcadeXCA/labels_test/'
-    masks = 'stenExp/model_runs/nnU-MambaBot/one/labels_test/'
+    labels_folder = 'LKM-UNet/data/nnUNet_raw/Dataset112_ArcadeXCA/labels_test/'
+    masks = 'stenExp/model_runs/LKM-UNet/two/labels_test/'
 
-    input_images_folder = 'U-Mamba/data/nnUNet_raw/Dataset112_ArcadeXCA/images_test/'
-    images = 'stenExp/model_runs/nnU-MambaBot/one/images_test/'
+    input_images_folder = 'LKM-UNet/data/nnUNet_raw/Dataset112_ArcadeXCA/images_test/'
+    images = 'stenExp/model_runs/LKM-UNet/two/images_test/'
 
     nifti2png(input_folder, out_preds)
     nifti2png(labels_folder, masks)
     nifti2png(input_images_folder, images)
 
-    save_path = 'stenExp/model_runs/nnU-MambaBot/one/results/'
-    results_path = 'stenExp/model_runs/nnU-MambaBot/one/results/results.txt'
+    save_path = 'stenExp/model_runs/LKM-UNet/two/results/'
+    results_path = 'stenExp/model_runs/LKM-UNet/two/results/results.txt'
     size=(256,256)
     calc_metrics(images, masks, out_preds, size, save_path, results_path)
