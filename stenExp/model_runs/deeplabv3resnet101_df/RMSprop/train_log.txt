@@ -1,0 +1,93 @@
+
+2025-07-24 15:20:30.130995
+Image Size: (256, 256)
+Batch Size: 8
+LR: 0.0001
+Epochs: 500
+Early Stopping Patience: 50
+
+Dataset Size:
+Train: 1000 - Valid: 200 - Test: 300
+
+Model: deeplabv3resnet101_df
+Optimizer: RMSprop
+Loss: BCE Dice Loss
+
+Valid F1 improved from 0.0000 to 0.0050. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 01 | Epoch Time: 1m 46s
+	Train Loss: 1.2309 - Jaccard: 0.0045 - F1: 0.0065 - Recall: 0.0184 - Precision: 0.8823
+	 Val. Loss: 1.1342 - Jaccard: 0.0027 - F1: 0.0050 - Recall: 0.0182 - Precision: 0.8231
+
+Valid F1 improved from 0.0050 to 0.1130. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 02 | Epoch Time: 1m 47s
+	Train Loss: 1.0920 - Jaccard: 0.0266 - F1: 0.0432 - Recall: 0.0687 - Precision: 0.6472
+	 Val. Loss: 1.0277 - Jaccard: 0.0683 - F1: 0.1130 - Recall: 0.1384 - Precision: 0.4056
+
+Valid F1 improved from 0.1130 to 0.2441. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 03 | Epoch Time: 1m 47s
+	Train Loss: 1.0063 - Jaccard: 0.0930 - F1: 0.1523 - Recall: 0.2820 - Precision: 0.3088
+	 Val. Loss: 0.9509 - Jaccard: 0.1508 - F1: 0.2441 - Recall: 0.4837 - Precision: 0.2946
+
+Valid F1 improved from 0.2441 to 0.2490. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 04 | Epoch Time: 1m 48s
+	Train Loss: 0.9300 - Jaccard: 0.1228 - F1: 0.1988 - Recall: 0.3762 - Precision: 0.2684
+	 Val. Loss: 0.8654 - Jaccard: 0.1575 - F1: 0.2490 - Recall: 0.3830 - Precision: 0.3531
+
+Valid F1 improved from 0.2490 to 0.3110. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 05 | Epoch Time: 1m 47s
+	Train Loss: 0.8612 - Jaccard: 0.1406 - F1: 0.2237 - Recall: 0.3838 - Precision: 0.3016
+	 Val. Loss: 0.7823 - Jaccard: 0.2022 - F1: 0.3110 - Recall: 0.4782 - Precision: 0.3431
+
+Valid F1 improved from 0.3110 to 0.3274. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 06 | Epoch Time: 1m 47s
+	Train Loss: 0.7969 - Jaccard: 0.1621 - F1: 0.2488 - Recall: 0.3832 - Precision: 0.3715
+	 Val. Loss: 0.7259 - Jaccard: 0.2147 - F1: 0.3274 - Recall: 0.4499 - Precision: 0.3647
+
+Valid F1 improved from 0.3274 to 0.3717. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 07 | Epoch Time: 1m 47s
+	Train Loss: 0.7574 - Jaccard: 0.1725 - F1: 0.2626 - Recall: 0.3923 - Precision: 0.3835
+	 Val. Loss: 0.6784 - Jaccard: 0.2469 - F1: 0.3717 - Recall: 0.5982 - Precision: 0.3287
+
+Valid F1 improved from 0.3717 to 0.4065. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 08 | Epoch Time: 1m 47s
+	Train Loss: 0.7243 - Jaccard: 0.1895 - F1: 0.2825 - Recall: 0.3920 - Precision: 0.4229
+	 Val. Loss: 0.6455 - Jaccard: 0.2762 - F1: 0.4065 - Recall: 0.6528 - Precision: 0.3628
+
+Valid F1 improved from 0.4065 to 0.4157. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 09 | Epoch Time: 1m 47s
+	Train Loss: 0.6953 - Jaccard: 0.2019 - F1: 0.2988 - Recall: 0.3971 - Precision: 0.4429
+	 Val. Loss: 0.6274 - Jaccard: 0.2819 - F1: 0.4157 - Recall: 0.6792 - Precision: 0.3620
+
+Valid F1 improved from 0.4157 to 0.4190. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 10 | Epoch Time: 1m 47s
+	Train Loss: 0.6801 - Jaccard: 0.2110 - F1: 0.3056 - Recall: 0.3910 - Precision: 0.4843
+	 Val. Loss: 0.6025 - Jaccard: 0.2920 - F1: 0.4190 - Recall: 0.5949 - Precision: 0.3939
+
+Valid F1 improved from 0.4190 to 0.4192. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 11 | Epoch Time: 1m 48s
+	Train Loss: 0.6844 - Jaccard: 0.2049 - F1: 0.2973 - Recall: 0.3846 - Precision: 0.4694
+	 Val. Loss: 0.6088 - Jaccard: 0.2902 - F1: 0.4192 - Recall: 0.6121 - Precision: 0.4270
+
+Epoch: 12 | Epoch Time: 1m 47s
+	Train Loss: 0.6536 - Jaccard: 0.2235 - F1: 0.3231 - Recall: 0.4112 - Precision: 0.4857
+	 Val. Loss: 0.5737 - Jaccard: 0.2955 - F1: 0.4153 - Recall: 0.4572 - Precision: 0.5702
+
+Valid F1 improved from 0.4192 to 0.4555. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 13 | Epoch Time: 1m 48s
+	Train Loss: 0.6486 - Jaccard: 0.2344 - F1: 0.3367 - Recall: 0.4186 - Precision: 0.4890
+	 Val. Loss: 0.5579 - Jaccard: 0.3236 - F1: 0.4555 - Recall: 0.5589 - Precision: 0.4868
+
+Epoch: 14 | Epoch Time: 1m 47s
+	Train Loss: 0.6342 - Jaccard: 0.2349 - F1: 0.3350 - Recall: 0.4164 - Precision: 0.4955
+	 Val. Loss: 0.6081 - Jaccard: 0.2981 - F1: 0.4319 - Recall: 0.6896 - Precision: 0.3907
+
+Valid F1 improved from 0.4555 to 0.4717. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 15 | Epoch Time: 1m 48s
+	Train Loss: 0.6340 - Jaccard: 0.2419 - F1: 0.3438 - Recall: 0.4225 - Precision: 0.4968
+	 Val. Loss: 0.5497 - Jaccard: 0.3360 - F1: 0.4717 - Recall: 0.6139 - Precision: 0.4758
+
+Valid F1 improved from 0.4717 to 0.4780. Saving checkpoint: stenExp/model_runs/deeplabv3resnet101_df/RMSprop/checkpoint.pth
+Epoch: 16 | Epoch Time: 1m 48s
+	Train Loss: 0.6134 - Jaccard: 0.2521 - F1: 0.3564 - Recall: 0.4307 - Precision: 0.4949
+	 Val. Loss: 0.5401 - Jaccard: 0.3412 - F1: 0.4780 - Recall: 0.6176 - Precision: 0.4489
+

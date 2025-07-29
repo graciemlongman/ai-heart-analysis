@@ -15,9 +15,9 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='deeplabv3resnet101_se'
-    bbox=False
+    model_choice='deeplabv3resnet101_df'
     optim_choice='RMSprop'
+    bbox=False
     resume=False
 
     """ Directories and log file """
