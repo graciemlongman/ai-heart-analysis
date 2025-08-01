@@ -27,3 +27,4 @@ dependencies:
       - mamba-ssm #pip install git+https://github.com/state-spaces/mamba.git --no-build-isolation
       - nibabel
       - yacs
+      - dynamic-network-architectures

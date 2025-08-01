@@ -80,7 +80,8 @@ def load_annotations(dataset_dir):
 import nibabel as nib
 import numpy as np
 from PIL import Image
-def prepare_data_for_nnunet(path='arcade/stenosis/', path_new='Dataset112_ArcadeXCA/'):
+#use preprocessed dataset already
+def prepare_data_for_nnunet(path='stenExp/datasets/arcade/stenosis/', path_new='Dataset112_ArcadeXCA/'):
     make_directories(path_new, version='nnunet')
 
     for split in ['train', 'test', 'val']:
@@ -405,5 +406,6 @@ def check_boxes(train_loader, valid_loader):
             break
 
 if __name__  == '__main__':
-    prepare_data_for_nnunet()
-    #create_dataset()
+    #prepare_data_for_nnunet()
+    #prepare_data_stenosis(copy_data=True)
+    prepare_data_for_yolo(preprocess=True)
