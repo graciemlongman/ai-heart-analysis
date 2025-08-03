@@ -2,4 +2,4 @@ Jaccard: 0.4897 - F1: 0.6335 - Recall: 0.6474 - Precision: 0.7042 - Acc: 0.9930 
 
 Jaccard: 0.4976 - F1: 0.6404 - Recall: 0.6878 - Precision: 0.6769 - Acc: 0.9928 - F2: 0.6564 - HD: 3.4926 
 
-correct data and no training interruption
+correct data and no training interruption 500 epochs
