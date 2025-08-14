@@ -69,9 +69,7 @@ class BBConv(nn.Module):
         
         self.bb_conv = nn.Sequential(
             nn.MaxPool2d(pool_ratio),
-            nn.Conv2d(in_feat, out_feat, kernel_size=3, padding=1),
-            #nn.MaxPool2d(pool_ratio),
-            #nn.Conv2d(out_feat, out_feat, kernel_size=3, padding=1)
+            nn.Conv2d(in_feat, out_feat, kernel_size=3, padding=1)
         )
 
     def forward(self, x):
@@ -180,7 +178,7 @@ class attBB_UNet(nn.Module):
         x4 = self.Att5(g=d5,x=x4)
         d5 = torch.cat((x4,d5),dim=1)        
         d5 = self.Up_conv5(d5)
-        
+         
         d4 = self.Up4(d5)
         x3 = self.Att4(g=d4,x=x3)
         d4 = torch.cat((x3,d4),dim=1)

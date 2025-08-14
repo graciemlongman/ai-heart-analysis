@@ -201,10 +201,6 @@ class ResNet(nn.Module):
             x = self._forward_layer(self.layer2, x)
             x = self._forward_layer(self.layer3, x)
             x = self._forward_layer(self.layer4, x)
-        
-        # x = self.avgpool(x)
-        # x = torch.flatten(x,1)
-        # x = self.fc(x)
 
         return {'out':x}
 
@@ -242,6 +238,22 @@ class DeepLabV3_SE(DeepLabV3):
     
 class DeepLabV3_DF(DeepLabV3):
     def __init__(self, backbone=ResNet(Bottleneck, [3,4,23,3], deformable=True), classifier=DeepLabHead(2048, 1)):
+        super().__init__(backbone, classifier)
+
+        self.backbone = backbone
+        self.classifier = classifier
+
+    def forward(self, x, b=None):
+        input_shape = x.shape[-2:]
+
+        features = self.backbone(x, b)
+        x = self.classifier(features['out'])
+
+        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
+        return x
+
+class DeepLabV3_DF2(DeepLabV3):
+    def __init__(self, backbone=ResNet(DF_Block, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
         super().__init__(backbone, classifier)
 
         self.backbone = backbone

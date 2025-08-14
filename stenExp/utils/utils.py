@@ -6,15 +6,19 @@ import cv2
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import torch
+from operator import add
 from sklearn.utils import shuffle
 from sklearn.metrics import accuracy_score, confusion_matrix
+
 try:
     from utils.metrics import precision, recall, F2, dice_score, jac_score, hd_dist
+    from utils.postprocess import *
 except:
     pass
 
 try:
     from stenExp.utils.metrics import precision, recall, F2, dice_score, jac_score, hd_dist
+    from stenExp.utils.postprocess import *
 except:
     pass
 
@@ -66,7 +70,6 @@ def create_file(path):
         train_log = open(path, "w")
         train_log.write("\n")
         train_log.close()
-
 
 ## Adapted from  https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/utils.py
 def calculate_metrics(y_true, y_pred, y_true_proc=True, y_pred_proc=True,size=None):
@@ -126,6 +129,45 @@ def mean_score(metrics_score, num_imgs, print_=False):
     
     return [jaccard, f1, recall, precision, acc, f2, hd]
 
+def metrics_on_preds(images, masks, preds, size, save_path, results_path, pp_threshold=50):
+    for item in ["joint", "procd_mask", 'overlay']:
+        if not os.path.exists(f"{save_path}/{item}"):
+            os.makedirs(f"{save_path}/{item}")
+        else:
+            file_exists_print_and_exit()
+
+    metrics_score, post_metrics_score = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    
+    for (x, y, z) in tqdm(zip(os.listdir(masks), os.listdir(preds), os.listdir(images)), total=len(masks)):
+        name = x.split('/')[-1]
+
+        img = cv2.imread(images+z, cv2.IMREAD_COLOR) # (512,512)
+        img = cv2.resize(img, size)
+
+        mask = cv2.imread(masks+x, cv2.IMREAD_GRAYSCALE)
+        mask= cv2.resize(mask, size)
+        save_mask = np.stack([mask,mask,mask],axis=-1)
+
+        y_pred = cv2.imread(preds+y, cv2.IMREAD_GRAYSCALE)
+        y_pred = cv2.resize(y_pred, size)
+        save_y_pred = np.stack([y_pred,y_pred,y_pred], axis=-1)
+        
+        score = calculate_metrics(mask, y_pred, y_true_proc='evaluate', y_pred_proc='postprocessed', size=size)
+        metrics_score = list(map(add, metrics_score, score))
+
+        y_post_pred = binary_remove_small_segments(cv2.resize(y_pred, (512,512)), pp_threshold)
+        save_y_post_pred = np.stack((cv2.resize(y_post_pred,size),) * 3, axis=-1)*255
+        
+        post_score=calculate_metrics(mask, y_post_pred, y_true_proc='evaluate', y_pred_proc='postprocessed', size=size)
+        post_metrics_score=list(map(add, post_metrics_score, post_score))
+
+        plot_true_vs_preds_to_file(size, save_path, name, img, save_mask, save_y_pred, save_y_post_pred)
+
+    metrics = mean_score(metrics_score, 300)
+    post_metrics = mean_score(post_metrics_score, 300)
+
+    save_test_results_to_file(results_path, metrics, post_metrics)
+
 def save_test_results_to_file(results_path, metrics, post_metrics, mean_time_taken=None, num_imgs=None):
     m_str = f"Jaccard: {metrics[0]:1.4f} - F1: {metrics[1]:1.4f} - Recall: {metrics[2]:1.4f} - Precision: {metrics[3]:1.4f} - Acc: {metrics[4]:1.4f} - F2: {metrics[5]:1.4f} - HD: {metrics[6]:1.4f} \n"
     pm_str = f"Jaccard: {post_metrics[0]:1.4f} - F1: {post_metrics[1]:1.4f} - Recall: {post_metrics[2]:1.4f} - Precision: {post_metrics[3]:1.4f} - Acc: {post_metrics[4]:1.4f} - F2: {post_metrics[5]:1.4f} - HD: {post_metrics[6]:1.4f} \n"
@@ -139,22 +181,13 @@ def save_test_results_to_file(results_path, metrics, post_metrics, mean_time_tak
         time_str = f"Mean FPS: {mean_fps} \nMean SPF: {mean_spf} \n"
         print_and_save(results_path, time_str)
 
-
 def plot_true_vs_preds_to_file(size, save_path, name, image, y_true, y_pred, y_post_pred):
     line = np.ones((size[0], 10, 3)) * 255
     cat_images = np.concatenate([image, line, y_true, line, y_pred, line, y_post_pred], axis=1)
     cv2.imwrite(f"{save_path}/joint/{name}", cat_images)
-    cv2.imwrite(f"{save_path}/mask/{name}", y_pred)
     cv2.imwrite(f"{save_path}/procd_mask/{name}", y_post_pred)
 
-def overlay_results(size, save_path, name, image, y_true, y_pred, y_post_pred):
-    overlay_dir = os.path.join(save_path, "overlay")
-    os.makedirs(overlay_dir, exist_ok=True)
-
-    line = np.ones((size[0], 10, 3)) * 255
     cat_raw_imgs = np.concatenate([image, line, image, line, image, line, image], axis=1)
-    cat_images = np.concatenate([image, line, y_true, line, y_pred, line, y_post_pred], axis=1)
-    
     overlaid_images = cv2.addWeighted(cat_raw_imgs, 0.5, cat_images, 0.5, 0)
     cv2.imwrite(f"{save_path}/overlay/{name}", overlaid_images)
 
@@ -190,7 +223,7 @@ try:
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
 
-    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, DeepLabV3_DF, nomod, _load_weights
+    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, DeepLabV3_DF, DeepLabV3_DF2, nomod, _load_weights
 
 except Exception as e:
     print(f"[IMPORT ERROR] {e}")
@@ -212,6 +245,8 @@ def ModelZoo(choice, partition=None):
         return _load_weights(DeepLabV3_SE())
     elif choice == 'deeplabv3resnet101_df':
         return _load_weights(DeepLabV3_DF())
+    elif choice == 'deeplabv3resnet101_df2':
+        return _load_weights(DeepLabV3_DF2())
     elif choice == 'deeplabv3resnet101_nomod':
         return _load_weights(nomod())
     elif choice == 'transunet':

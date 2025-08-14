@@ -15,7 +15,7 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='deeplabv3resnet101_df'
+    model_choice='deeplabv3resnet101_df2'
     optim_choice='RMSprop'
     bbox=False
     resume=False

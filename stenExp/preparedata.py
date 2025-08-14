@@ -6,9 +6,13 @@ import shutil
 from glob import glob
 from collections import defaultdict
 from preprocess import *
-
+import nibabel as nib
+import numpy as np
+from PIL import Image
 import torch
 from torch.utils.data import Dataset, DataLoader
+from sklearn.utils import shuffle
+from utils.utils import print_and_save
 
 
 def copy_file(src, dst):
@@ -39,7 +43,6 @@ def write_json(path):
             }
     with open(f'{path}/dataset.json', 'w', encoding='utf-8') as file:
         json.dump(data, file)
-
 
 def make_directories(path_new, version='torch'):
     if version=='torch':
@@ -77,9 +80,45 @@ def load_annotations(dataset_dir):
             file_store[i]=anns 
     return file_store
 
-import nibabel as nib
-import numpy as np
-from PIL import Image
+def annotation_to_mask(path_to_json, split):
+    num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
+
+    with open(path_to_json, encoding="utf-8") as file:
+        file_store = json.load(file)
+        annotations = file_store['annotations']
+
+    name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
+
+    masks = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
+    for ann in annotations:
+        points = np.array([ann["segmentation"][0][::2], ann["segmentation"][0][1::2]], dtype=np.int32).T
+        points = points.reshape((-1, 1, 2))
+        tmp = np.zeros((512, 512), dtype=np.uint8)
+        cv2.fillPoly(tmp, [points], (1))
+        masks[int(name_cls[ann["image_id"]])-1] |= tmp
+
+    return masks 
+
+def annotation_to_box(path_to_json, split):
+    num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
+
+    with open(path_to_json, encoding="utf-8") as file:
+        file_store = json.load(file)
+        annotations = file_store['annotations']
+
+    name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
+    
+
+    boxes = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
+    for ann in annotations:
+        p = np.array(ann["bbox"], dtype=np.int32)
+        points = np.array([[p[0], p[1]], [p[0]+p[2], p[1]], [p[0]+p[2],p[1]+p[3]], [p[0], p[1]+p[3]]], dtype=np.int32)
+        tmp = np.zeros((512, 512), dtype=np.uint8)
+        cv2.fillPoly(tmp, [points], (1))
+        boxes[int(name_cls[ann["image_id"]])-1] |= tmp
+
+    return boxes 
+
 #use preprocessed dataset already
 def prepare_data_for_nnunet(path='stenExp/datasets/arcade/stenosis/', path_new='Dataset112_ArcadeXCA/'):
     make_directories(path_new, version='nnunet')
@@ -139,96 +178,45 @@ def prepare_data_for_yolo(path='arcade/stenosis/', path_new='stenExp/datasets/ar
             filename = os.path.splitext(k)[0]
             with open(f'{path_new}/labels/{split}/{filename}.txt', "w", encoding="utf-8") as file:
                     file.write("\n".join(v))
-
         # end of adaption
     
         #copy images into correct file structures
         for img_id, filename in name_cls.items():
             src = f'{path}{split}/images/{filename}'
             dst = f'{path_new}images/{split}/'
-
-            print(src)
-            print(dst)
-
             copy_file(src,dst)
             if preprocess:
                 preprocess_inplace(f'{dst}{filename}')
 
-
-def annotation_to_mask(path_to_json, split):
-    num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
-
-    with open(path_to_json, encoding="utf-8") as file:
-        file_store = json.load(file)
-        annotations = file_store['annotations']
-
-    name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
-    
-
-    masks = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
-    for ann in annotations:
-        points = np.array([ann["segmentation"][0][::2], ann["segmentation"][0][1::2]], dtype=np.int32).T
-        points = points.reshape((-1, 1, 2))
-        tmp = np.zeros((512, 512), dtype=np.uint8)
-        cv2.fillPoly(tmp, [points], (1))
-        masks[int(name_cls[ann["image_id"]])-1] |= tmp
-
-    return masks 
-
-def annotation_to_box(path_to_json, split):
-    num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
-
-    with open(path_to_json, encoding="utf-8") as file:
-        file_store = json.load(file)
-        annotations = file_store['annotations']
-
-    name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
-    
-
-    boxes = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
-    for ann in annotations:
-        p = np.array(ann["bbox"], dtype=np.int32)
-        points = np.array([[p[0], p[1]], [p[0]+p[2], p[1]], [p[0]+p[2],p[1]+p[3]], [p[0], p[1]+p[3]]], dtype=np.int32)
-        # print(points)
-        # sys.exit()
-        #points = points.reshape((-1,1,2))
-        tmp = np.zeros((512, 512), dtype=np.uint8)
-        cv2.fillPoly(tmp, [points], (1))
-        boxes[int(name_cls[ann["image_id"]])-1] |= tmp
-
-    return boxes 
-
-def create_dataset(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/'):
-    make_directories(path_new)
-    
-    for split in ['train', 'test', 'val']:
-        image_paths = sorted(glob(os.path.join(path,split,'images', '*.png')))
-        image_paths = sorted(image_paths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
-
-        dst_img=path_new+f'{split}/images/'
-        json_src = path+f'{split}/annotations/{split}.json'
-        json_dst=path_new+f'{split}/annotations/'
-        box_dst=path_new+f'{split}/boxes/'
+def prepare_data_stenosis(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/', copy_data=False):
+    if copy_data: #copy data to new file path location, and store as png matrices rather than coordinates
+        make_directories(path_new)
         
-        for src_img in image_paths:
-            print('source',src_img)
-            print('dst', dst_img)
-            copy_file(src_img, dst_img)
-        copy_file(json_src, json_dst)
+        for split in ['train', 'test', 'val']:
+            image_paths = sorted(glob(os.path.join(path,split,'images', '*.png')))
+            image_paths = sorted(image_paths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
 
-        for i, mask in enumerate(annotation_to_mask(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
-            mask=(mask* 255).astype(np.uint8)
-            cv2.imwrite(os.path.join(json_dst,f'{i+1}.png'),mask)
-        
-        for i, box in enumerate(annotation_to_box(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
-            box=(box* 255).astype(np.uint8)
-            cv2.imwrite(os.path.join(box_dst,f'{i+1}.png'),box)
+            dst_img=path_new+f'{split}/images/'
+            json_src = path+f'{split}/annotations/{split}.json'
+            json_dst=path_new+f'{split}/annotations/'
+            box_dst=path_new+f'{split}/boxes/'
+            
+            for src_img in image_paths:
+                print('source',src_img)
+                print('dst', dst_img)
+                copy_file(src_img, dst_img)
+            copy_file(json_src, json_dst)
 
-def prepare_data_stenosis(path='stenExp/datasets/arcade/stenosis/', copy_data=False):
-    if copy_data:
-        create_dataset()
-    for split in ['train', 'test', 'val']:
-        for image_path in sorted(glob(os.path.join(path,split,'images', '*.png'))):
+            for i, mask in enumerate(annotation_to_mask(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
+                mask=(mask* 255).astype(np.uint8)
+                cv2.imwrite(os.path.join(json_dst,f'{i+1}.png'),mask)
+            
+            for i, box in enumerate(annotation_to_box(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
+                box=(box* 255).astype(np.uint8)
+                cv2.imwrite(os.path.join(box_dst,f'{i+1}.png'),box)
+
+    for split in ['train', 'test', 'val']: #preprocess
+        for image_path in sorted(glob(os.path.join(path_new,split,'images', '*.png'))):
             preprocess_inplace(image_path)
 
 
@@ -304,8 +292,6 @@ class ARCADE_DATASET(Dataset):
     def __len__(self):
         return self.n_samples
 
-from sklearn.utils import shuffle
-from utils.utils import print_and_save
 def data_loader(train_log_path, bbox, size, transform, batch_size):
     if bbox:
         print('Including bbox')
@@ -406,6 +392,6 @@ def check_boxes(train_loader, valid_loader):
             break
 
 if __name__  == '__main__':
-    #prepare_data_for_nnunet()
+    prepare_data_for_nnunet()
     #prepare_data_stenosis(copy_data=True)
-    prepare_data_for_yolo(preprocess=True)
+    #prepare_data_for_yolo(preprocess=True)

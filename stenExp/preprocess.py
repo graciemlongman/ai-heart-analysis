@@ -7,10 +7,10 @@ import skimage
 from scipy.ndimage import gaussian_filter
 from skimage import io, exposure
 
-from utils_StenUNet.DDFB import *
-from utils_StenUNet.guided_filter import *
-from utils_StenUNet.homomorphic_filter import *
-from utils_StenUNet.multiscale_tophat import *
+from utils.utils_StenUNet.DDFB import *
+from utils.utils_StenUNet.guided_filter import *
+from utils.utils_StenUNet.homomorphic_filter import *
+from utils.utils_StenUNet.multiscale_tophat import *
 
 def preprocess(img):
 

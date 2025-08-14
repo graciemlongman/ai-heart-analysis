@@ -113,8 +113,8 @@ class BB_Unet(Module):
         # bbox encoder
         if self.train_flag: #i.e. dont have bboxes when we run inference
             x3 = x3*self.b1(bb)
-            #x2 = x2*self.b2(bb)
-            #x1 = x1*self.b3(bb)
+            # x2 = x2*self.b2(bb)
+            # x1 = x1*self.b3(bb)
 
         # Up-sampling
         u1 = self.up1(x4, x3)
