@@ -392,6 +392,6 @@ def check_boxes(train_loader, valid_loader):
             break
 
 if __name__  == '__main__':
-    prepare_data_for_nnunet()
-    #prepare_data_stenosis(copy_data=True)
-    #prepare_data_for_yolo(preprocess=True)
+    #prepare_data_for_nnunet()
+    prepare_data_stenosis(copy_data=True)
+    prepare_data_for_yolo(preprocess=True)

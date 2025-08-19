@@ -68,7 +68,6 @@ class SegModel:
             y_true_3d=np.stack((y_true,) * 3, axis=-1)
 
             plot_true_vs_preds_to_file(size, save_path, name, image, y_true_3d, y_pred_3d, y_post_pred_3d)
-            overlay_results(size, save_path, name, image, y_true_3d, y_pred_3d, y_post_pred_3d)
 
         mean_score(metrics,num_imgs=300, print_=True)
         mean_score(metrics_post, num_imgs=300, print_=True)

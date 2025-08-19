@@ -1,6 +1,3 @@
-
-### https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
-
 import time
 import datetime
 import albumentations as A
@@ -15,9 +12,9 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='deeplabv3resnet101_df2'
+    model_choice='deeplabv3resnet101_cbam_class'
     optim_choice='RMSprop'
-    bbox=False
+    use_bbox=False
     resume=False
 
     """ Directories and log file """
@@ -53,19 +50,13 @@ if __name__ == "__main__":
     # print('Preprocessing dataset...')
     # prepare_data_stenosis(copy_data=True)
 
-    train_loader, valid_loader = data_loader(train_log_path, bbox, size, transform, batch_size)
+    train_loader, valid_loader = data_loader(train_log_path, use_bbox, size, transform, batch_size)
 
     #check_labels(train_loader, valid_loader, zip(test_x,test_y))
 
     """ Model """
-    model = ModelZoo(choice=model_choice, partition='train')
-    if model_choice == 'saumamba':
-        model.load_from()
-    if model_choice == 'transunet':
-        model.load_from(weights=np.load('stenExp/models/transunet/pretrained_weights/weights.pt'))
-
     device = torch.device('cuda')
-    model.to(device)
+    model = ModelZoo(choice=model_choice, partition='train').to(device)
 
     if resume:
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
@@ -89,8 +80,8 @@ if __name__ == "__main__":
         start_time = time.time()
 
         torch.autograd.set_detect_anomaly(True)
-        train_loss, train_metrics = train(model, train_loader, optimizer, loss_fn, device, bbox)
-        valid_loss, valid_metrics = evaluate(model, valid_loader, loss_fn, device, bbox)
+        train_loss, train_metrics = train(model, train_loader, optimizer, loss_fn, device, use_bbox)
+        valid_loss, valid_metrics = evaluate(model, valid_loader, loss_fn, device, use_bbox)
         scheduler.step(valid_loss)
  
         if valid_metrics[1] > best_valid_metrics:

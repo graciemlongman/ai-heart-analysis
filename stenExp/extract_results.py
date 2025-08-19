@@ -55,16 +55,20 @@ mamba_paths = ['./stenExp/model_runs/saumamba/Adam_no_weights/results/results.tx
                 './stenExp/model_runs/xLSTM-UNet/one/results/results.txt',
                 './stenExp/model_runs/xLSTM-UNet/two/results/results.txt',
 
-                './stenExp/model_runs/LKM-UNet/one/results/results.txt']
+                './stenExp/model_runs/LKM-UNet/one/results/results.txt',
+                './stenExp/model_runs/LKM-UNetBot/one/results/results.txt']
 
 bb_paths = ['./stenExp/model_runs/bbunet/Adam/results/results.txt',
             './stenExp/model_runs/bbaunet/Adam/results/results.txt',
             './stenExp/model_runs/bbunet_bb_in_x3_only/Adam/results/results.txt',
-            './stenExp/model_runs/deeplabv3resnet101_bb/Adam/results/results.txt',]
+            './stenExp/model_runs/deeplabv3resnet101_bb/RMSprop/results/results.txt',]
 
-dlv3_paths = ['./stenExp/model_runs/deeplabv3resnet101_nomod/Adam/results/results.txt',
-              './stenExp/model_runs/deeplabv3resnet101_se/Adam/results/results.txt',
-              './stenExp/model_runs/deeplabv3resnet101_df/Adam/results/results.txt']
+dlv3_paths = ['./stenExp/model_runs/deeplabv3resnet101_nomod/RMSprop/results/results.txt',
+              './stenExp/model_runs/deeplabv3resnet101_se/RMSprop/results/results.txt',
+              './stenExp/model_runs/deeplabv3resnet101_df/RMSprop/results/results.txt',
+              './stenExp/model_runs/deeplabv3resnet101_df2/RMSprop/results/results.txt',
+              './stenExp/model_runs/deeplabv3resnet101_cbam_block/RMSprop/results/results.txt',
+              './stenExp/model_runs/deeplabv3resnet101_cbam_class/RMSprop/results/results.txt']
 
 
 """ Vars """

@@ -223,7 +223,7 @@ try:
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
 
-    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, DeepLabV3_DF, DeepLabV3_DF2, nomod, _load_weights
+    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, DeepLabV3_DF, DeepLabV3_DF2, DeepLabV3_CBAM, DeepLabV3_CBAM_class, nomod, _load_weights
 
 except Exception as e:
     print(f"[IMPORT ERROR] {e}")
@@ -247,6 +247,10 @@ def ModelZoo(choice, partition=None):
         return _load_weights(DeepLabV3_DF())
     elif choice == 'deeplabv3resnet101_df2':
         return _load_weights(DeepLabV3_DF2())
+    elif choice == 'deeplabv3resnet101_cbam_block':
+        return _load_weights(DeepLabV3_CBAM())
+    elif choice == 'deeplabv3resnet101_cbam_class':
+        return _load_weights(DeepLabV3_CBAM_class())
     elif choice == 'deeplabv3resnet101_nomod':
         return _load_weights(nomod())
     elif choice == 'transunet':

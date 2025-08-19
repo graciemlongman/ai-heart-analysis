@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'deeplabv3resnet101_df2'
+    model_choice = 'deeplabv3resnet101_cbam_class'
     optim_choice = 'RMSprop'
     bbox=False
 
