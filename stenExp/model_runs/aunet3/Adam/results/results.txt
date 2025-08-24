@@ -1,8 +1,4 @@
+Jaccard: 0.4166 - F1: 0.5596 - Recall: 0.6006 - Precision: 0.6182 - Acc: 0.9917 - F2: 0.5714 - HD: 3.5087 
 
-Jaccard: 0.3911 - F1: 0.5301 - Recall: 0.5847 - Precision: 0.5707 - Acc: 0.9910 - F2: 0.5498 - HD: 3.5947 
-
-Jaccard: 0.3921 - F1: 0.5308 - Recall: 0.5840 - Precision: 0.5767 - Acc: 0.9911 - F2: 0.5498 - HD: 3.6013 
-
-Mean FPS: 342.3942129721593 
-Mean SPF: 9.735367033216688e-06 
+Jaccard: 0.4274 - F1: 0.5693 - Recall: 0.6434 - Precision: 0.5980 - Acc: 0.9915 - F2: 0.5975 - HD: 3.5336 
 

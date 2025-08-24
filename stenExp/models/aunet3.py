@@ -1,7 +1,6 @@
 
 ## ADAPTED FROM https://github.com/LeeJunHyun/Image_Segmentation/blob/master/network.py
-## Removed 5th conv block in decoder and replaced with ASPP block
-## Replace 1-4th conv blocks with bottleneck resblocks
+## Add residual block to encoder 
 
 
 import torch
@@ -48,32 +47,26 @@ class conv_block(nn.Module):
         x = self.conv(x)
         return x
 
-class bottleneck(nn.Module):
+class residualblock(nn.Module):
     def __init__(self, ch_in, ch_out, base_width=16):
-        super(bottleneck,self).__init__()
+        super(residualblock, self).__init__()
         self.Downsample = nn.Sequential(
-            nn.Conv2d(ch_in, ch_out, kernel_size=1, stride=1, bias=False),
+            nn.Conv2d(ch_in, ch_out, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(ch_out)
         )
         
-        width = int(ch_out * base_width/64)
 
         self.Conv1 = nn.Sequential(
-            nn.Conv2d(ch_in, width, kernel_size=1, stride=1, bias=False),
-            nn.BatchNorm2d(width),
+            nn.Conv2d(ch_in, ch_out, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.BatchNorm2d(ch_out),
             nn.ReLU(inplace=True)
             )
         
         self.Conv2 = nn.Sequential(
-            nn.Conv2d(width, width, kernel_size=3, stride=1, padding=1, dilation=1, bias=False),
-            nn.BatchNorm2d(width),
-            nn.ReLU(inplace=True)
-            )
-        
-        self.Conv3 = nn.Sequential(
-            nn.Conv2d(width, ch_out, kernel_size=1, stride=1, bias=False),
+            nn.Conv2d(ch_out, ch_out, kernel_size=3, stride=1, padding=1, bias=False),
             nn.BatchNorm2d(ch_out),
             )
+        
         
         self.Relu = nn.ReLU(inplace=True)
     
@@ -82,7 +75,6 @@ class bottleneck(nn.Module):
         
         x = self.Conv1(x)
         x = self.Conv2(x)
-        x = self.Conv3(x)
         
         x = x + x_d
         x = self.Relu(x)
@@ -175,10 +167,10 @@ class AttU_Net3(nn.Module):
         
         self.Maxpool = nn.MaxPool2d(kernel_size=2,stride=2)
 
-        self.Encoder1 = bottleneck(ch_in=img_ch,ch_out=64)
-        self.Encoder2 = bottleneck(ch_in=64,ch_out=128)
-        self.Encoder3 = bottleneck(ch_in=128,ch_out=256)
-        self.Encoder4 = bottleneck(ch_in=256,ch_out=512)
+        self.Encoder1 = residualblock(ch_in=img_ch,ch_out=64)
+        self.Encoder2 = residualblock(ch_in=64,ch_out=128)
+        self.Encoder3 = residualblock(ch_in=128,ch_out=256)
+        self.Encoder4 = residualblock(ch_in=256,ch_out=512)
 
         self.bridge = ASPP(ch_in=512, ch_out=1024)
 

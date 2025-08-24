@@ -192,7 +192,7 @@ class BB_block(Bottleneck):
         return x3
     
 class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes=1, deformable=False, kernel_cbam = 3, reduction_ratio=1, use_cbam_class = False):
+    def __init__(self, block, layers, num_classes=1, deformable=False, use_cbam_class = False):
         super(ResNet, self).__init__()
         self.in_channels = 64
         self.dilation=1
@@ -207,10 +207,13 @@ class ResNet(nn.Module):
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
 
-        if deformable: #make them deformable atrous convs
+        if deformable: #make them deformable convs
             block = DF_Block
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=True)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=True)
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        else:
+            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=True)
+            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=True)
 
         # Final fully connected layer
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
@@ -285,103 +288,8 @@ class ResNet(nn.Module):
 
         return {'out':x}
 
-class DeepLabV3_BB(DeepLabV3):
-    def __init__(self, backbone=ResNet(BB_block, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
-        super().__init__(backbone, classifier)
 
-        self.backbone = backbone
-        self.classifier = classifier
-
-    def forward(self, x, b=None):
-        input_shape = x.shape[-2:]
-
-        features = self.backbone(x, b)
-        x = self.classifier(features['out'])
-
-        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
-    
-class DeepLabV3_SE(DeepLabV3):
-    def __init__(self, backbone=ResNet(SE_block, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
-        super().__init__(backbone, classifier)
-
-        self.backbone = backbone
-        self.classifier = classifier
-
-    def forward(self, x, b=None):
-        input_shape = x.shape[-2:]
-
-        features = self.backbone(x, b)
-        x = self.classifier(features['out'])
-
-        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
-    
-class DeepLabV3_DF(DeepLabV3):
-    def __init__(self, backbone=ResNet(Bottleneck, [3,4,23,3], deformable=True), classifier=DeepLabHead(2048, 1)):
-        super().__init__(backbone, classifier)
-
-        self.backbone = backbone
-        self.classifier = classifier
-
-    def forward(self, x, b=None):
-        input_shape = x.shape[-2:]
-
-        features = self.backbone(x, b)
-        x = self.classifier(features['out'])
-
-        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
-
-class DeepLabV3_DF2(DeepLabV3):
-    def __init__(self, backbone=ResNet(DF_Block, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
-        super().__init__(backbone, classifier)
-
-        self.backbone = backbone
-        self.classifier = classifier
-
-    def forward(self, x, b=None):
-        input_shape = x.shape[-2:]
-
-        features = self.backbone(x, b)
-        x = self.classifier(features['out'])
-
-        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
-
-class DeepLabV3_CBAM(DeepLabV3):
-    def __init__(self, backbone=ResNet(CBAM_Block, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
-        super().__init__(backbone, classifier)
-
-        self.backbone = backbone
-        self.classifier = classifier
-
-    def forward(self, x, b=None):
-        input_shape = x.shape[-2:]
-
-        features = self.backbone(x, b)
-        x = self.classifier(features['out'])
-
-        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
-
-class DeepLabV3_CBAM_class(DeepLabV3):
-    def __init__(self, backbone=ResNet(Bottleneck, [3,4,23,3], use_cbam_class=True), classifier=DeepLabHead(2048, 1)):
-        super().__init__(backbone, classifier)
-
-        self.backbone = backbone
-        self.classifier = classifier
-
-    def forward(self, x, b=None):
-        input_shape = x.shape[-2:]
-
-        features = self.backbone(x, b)
-        x = self.classifier(features['out'])
-
-        x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
-
-class nomod(DeepLabV3):
+class ResNet101DeepLabV3(DeepLabV3):
     def __init__(self, backbone=ResNet(Bottleneck, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
         super().__init__(backbone, classifier)
 
@@ -419,7 +327,7 @@ def _load_weights(model, pretrained_model=None):
 
 if __name__ == '__main__': 
     
-    model = _load_weights(DeepLabV3_CBAM())
+    model = _load_weights(ResNet101DeepLabV3(backbone=ResNet(SE_block, [3,4,23,3])))
     x = torch.randn(8, 3, 256, 256)
     b = torch.randn(8, 1, 256, 256)
 

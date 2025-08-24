@@ -12,13 +12,13 @@ if __name__ == "__main__":
     seeding(42)
 
     """ Vars """
-    model_choice='deeplabv3resnet101_cbam_class'
-    optim_choice='RMSprop'
-    use_bbox=False
+    model_choice='bbunet'
+    optim_choice='Adam'
+    use_bbox=True
     resume=False
 
     """ Directories and log file """
-    folder = f'{model_choice}/{optim_choice}'
+    folder = f'{model_choice}_res/{optim_choice}'
     train_log_path = f"stenExp/model_runs/{folder}/train_log.txt" if not resume else f"stenExp/model_runs/{folder}/train_log_resumed.txt"
     checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
 

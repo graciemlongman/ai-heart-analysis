@@ -223,8 +223,8 @@ try:
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
 
-    from models.resnet_dlv3 import DeepLabV3_BB, DeepLabV3_SE, DeepLabV3_DF, DeepLabV3_DF2, DeepLabV3_CBAM, DeepLabV3_CBAM_class, nomod, _load_weights
-
+    from models.resnet_dlv3 import ResNet101DeepLabV3, ResNet, SE_block, BB_block, DF_Block, CBAM_Block, _load_weights
+    from torchvision.models.resnet import Bottleneck
 except Exception as e:
     print(f"[IMPORT ERROR] {e}")
     pass
@@ -240,19 +240,19 @@ def ModelZoo(choice, partition=None):
         model.classifier[4] = nn.Conv2d(256, 1, kernel_size=1)
         return model
     elif choice == 'deeplabv3resnet101_bb':
-        return _load_weights(DeepLabV3_BB())
+        return _load_weights(ResNet101DeepLabV3(backbone=ResNet(BB_block, [3,4,23,3])))
     elif choice == 'deeplabv3resnet101_se':
-        return _load_weights(DeepLabV3_SE())
+        return _load_weights(ResNet101DeepLabV3(backbone=ResNet(SE_block, [3,4,23,3])))
     elif choice == 'deeplabv3resnet101_df':
-        return _load_weights(DeepLabV3_DF())
+        return _load_weights(ResNet101DeepLabV3(backbone=ResNet(Bottleneck, [3,4,23,3], deformable=True)))
     elif choice == 'deeplabv3resnet101_df2':
-        return _load_weights(DeepLabV3_DF2())
+        return _load_weights(ResNet101DeepLabV3(backbone=ResNet(DF_Block, [3,4,23,3])))
     elif choice == 'deeplabv3resnet101_cbam_block':
-        return _load_weights(DeepLabV3_CBAM())
+        return _load_weights(ResNet101DeepLabV3(backbone=ResNet(CBAM_Block, [3,4,23,3])))
     elif choice == 'deeplabv3resnet101_cbam_class':
-        return _load_weights(DeepLabV3_CBAM_class())
+        return _load_weights(ResNet101DeepLabV3(backbone=ResNet(Bottleneck, [3,4,23,3], use_cbam_class=True)))
     elif choice == 'deeplabv3resnet101_nomod':
-        return _load_weights(nomod())
+        return _load_weights(ResNet101DeepLabV3())
     elif choice == 'transunet':
         return TransUNet(img_dim=256,
                           in_channels=3,
@@ -373,3 +373,6 @@ def plot_training_curve(path_to_log_files, save_img_loc):
     ax.legend()
     plt.savefig(save_img_loc)
     plt.close()
+
+if __name__ == '__main__':
+    model = ModelZoo('deeplabv3resnet101_cbam_block')

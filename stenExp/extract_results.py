@@ -36,7 +36,7 @@ pp_paths = ['./stenExp/model_runs/attentionunet/postprocexp/thresh_25/results/re
 mod_paths = ['./stenExp/model_runs/attentionunet/Adam/results/results.txt',
              './stenExp/model_runs/aunet1/Adam/results/results.txt',
              './stenExp/model_runs/aunet2/Adam/results/results.txt',
-             './stenExp/model_runs/aunet3/Adam/results/results.txt',
+             './stenExp/model_runs/aunet3_res/Adam/results/results.txt',
              './stenExp/model_runs/aunet4/Adam/results/results.txt',]
 
 mamba_paths = ['./stenExp/model_runs/saumamba/Adam_no_weights/results/results.txt',
@@ -49,14 +49,11 @@ mamba_paths = ['./stenExp/model_runs/saumamba/Adam_no_weights/results/results.tx
                 './stenExp/model_runs/attumambaEnc/Adam/results/results.txt',
                 './stenExp/model_runs/attumambaEnc_2/Adam/results/results.txt',
 
-                './stenExp/model_runs/nnU-MambaBot/one/results/results.txt',
-                './stenExp/model_runs/nnU-attUMambaBot_2_2_2/one/results/results.txt',
+                './stenExp/model_runs/nnU-MambaBot_final/one/results/results.txt',
+                './stenExp/model_runs/nnU-attUMambaBot_2_final/one/results/results.txt',
 
-                './stenExp/model_runs/xLSTM-UNet/one/results/results.txt',
-                './stenExp/model_runs/xLSTM-UNet/two/results/results.txt',
-
-                './stenExp/model_runs/LKM-UNet/one/results/results.txt',
-                './stenExp/model_runs/LKM-UNetBot/one/results/results.txt']
+                './stenExp/model_runs/LKM-UNet_final/one/results/results.txt',
+                './stenExp/model_runs/LKM-UNetBot_final/one/results/results.txt']
 
 bb_paths = ['./stenExp/model_runs/bbunet/Adam/results/results.txt',
             './stenExp/model_runs/bbaunet/Adam/results/results.txt',
@@ -72,8 +69,8 @@ dlv3_paths = ['./stenExp/model_runs/deeplabv3resnet101_nomod/RMSprop/results/res
 
 
 """ Vars """
-path_to_log_files = bb_paths
-save_path = 'stenExp/scores/bb_scores.csv'
+path_to_log_files = mod_paths
+save_path = 'stenExp/scores/aunet_mod_scores.csv'
 headings='Model,Jaccard,F1,Recall,Precision,Acc,F2,HD,MFPS,MSPF'
 
 create_file(save_path)

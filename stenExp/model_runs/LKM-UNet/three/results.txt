@@ -1,5 +1,0 @@
-Jaccard: 0.4707 - F1: 0.6100 - Recall: 0.6115 - Precision: 0.7054 - Acc: 0.9927 - F2: 0.6018 - HD: 3.4422 
-
-Jaccard: 0.4801 - F1: 0.6179 - Recall: 0.6508 - Precision: 0.6791 - Acc: 0.9926 - F2: 0.6267 - HD: 3.4522 
-
-this is after roughly 1750 epochs. still doesn't look close to converged. pfft.

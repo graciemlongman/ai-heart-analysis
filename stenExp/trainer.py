@@ -37,39 +37,29 @@ def train(model, loader, optimizer, loss_fn, device, bbox):
     epoch_recall = 0.0 
     epoch_precision = 0.0
 
-    if bbox:
-        for i, (x, y, b) in enumerate(loader):
-            x = x.to(device, dtype=torch.float32)
-            y = y.to(device, dtype=torch.float32)
-            b = y.to(device, dtype=torch.float32)
+    for batch in loader:
+        if bbox:
+            x,y,b = batch
+            b = b.to(device, dtype=torch.float32)
+        else:
+            x,y = batch
+            b=None
+        x = x.to(device, dtype=torch.float32)
+        y = y.to(device, dtype=torch.float32)
 
-            optimizer.zero_grad()
-            y_pred = model(x,b)
-            if isinstance(y_pred, collections.OrderedDict):
-                y_pred=y_pred['out']
-            loss = loss_fn(y_pred, y)
-            with torch.autograd.set_detect_anomaly(True):
-                loss.backward()
-            optimizer.step()
-            epoch_loss += loss.item()
+        optimizer.zero_grad()
 
-            epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
+        y_pred = model(x, b) if b is not None else model(x)
 
-    else:
-        for i, (x, y) in enumerate(loader):
-            x = x.to(device, dtype=torch.float32)
-            y = y.to(device, dtype=torch.float32)
+        if isinstance(y_pred, collections.OrderedDict):
+            y_pred=y_pred['out']
 
-            optimizer.zero_grad()
-            y_pred = model(x)
-            if isinstance(y_pred, collections.OrderedDict):
-                y_pred=y_pred['out']
-            loss = loss_fn(y_pred, y)
-            loss.backward()
-            optimizer.step()
-            epoch_loss += loss.item()
+        loss = loss_fn(y_pred, y)
+        loss.backward()
+        optimizer.step()
 
-            epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
+        epoch_loss += loss.item()
+        epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
 
     epoch_loss = epoch_loss/len(loader)
     epoch_jac = epoch_jac/len(loader)
@@ -90,29 +80,25 @@ def evaluate(model, loader, loss_fn, device, bbox):
     epoch_precision = 0.0
 
     with torch.no_grad():
-        if bbox:
-            for i, (x,y,b) in enumerate(loader):
-                x = x.to(device, dtype=torch.float32)
-                y = y.to(device, dtype=torch.float32)
+        for batch in loader:
+            if bbox:
+                x,y,b = batch
                 b = b.to(device, dtype=torch.float32)
+            else:
+                x,y = batch
+                b=None
+            x = x.to(device, dtype=torch.float32)
+            y = y.to(device, dtype=torch.float32)
+            
+            y_pred = model(x,b) if b is not None else model(x)
 
-                y_pred = model(x,b)
-                loss = loss_fn(y_pred, y)
-                epoch_loss += loss.item()
-
-                epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
-        else:
-            for i, (x, y) in enumerate(loader):
-                x = x.to(device, dtype=torch.float32)
-                y = y.to(device, dtype=torch.float32)
-
-                y_pred = model(x)
-                if isinstance(y_pred, collections.OrderedDict):
+            if isinstance(y_pred, collections.OrderedDict):
                     y_pred=y_pred['out']
-                loss = loss_fn(y_pred, y)
-                epoch_loss += loss.item()
 
-                epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
+            loss = loss_fn(y_pred, y)
+            epoch_loss += loss.itme()
+
+            epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
 
         epoch_loss = epoch_loss/len(loader)
         epoch_jac = epoch_jac/len(loader)
