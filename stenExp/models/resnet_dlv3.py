@@ -209,11 +209,8 @@ class ResNet(nn.Module):
 
         if deformable: #make them deformable convs
             block = DF_Block
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        else:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=True)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=True)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=True)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=True)
 
         # Final fully connected layer
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))

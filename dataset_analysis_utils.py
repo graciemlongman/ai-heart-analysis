@@ -8,6 +8,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# functions useful for the exploratory analysis notebooks
+
 def store_images(json_file, path):
     store={}
     for img in json_file["images"]:

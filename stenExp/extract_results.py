@@ -1,7 +1,9 @@
 import os
 from utils.utils import create_file, print_and_save
 
-# modify script as necessary for how you want results table to look
+# Script which extracts the outputted metrics from the relevent results.txt 
+# files generated after inference
+
 # find . -type f -name "results.txt"
 
 orig_exp_paths = ['./stenExp/model_runs/deeplabv3resnet101/one/results/results.txt',

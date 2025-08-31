@@ -7,6 +7,10 @@ import numpy as np
 import os
 from operator import add
 
+# script which converts the predicted images to png and then
+# calculates the metrics on the preds, storing them in the 
+# correct folder in model_runs 
+
 def nifti2png(input_folder, output_folder):
     if not os.path.exists(output_folder): # Create folder to store png outputs
         os.makedirs(output_folder)
