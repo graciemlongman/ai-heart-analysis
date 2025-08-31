@@ -96,7 +96,7 @@ def evaluate(model, loader, loss_fn, device, bbox):
                     y_pred=y_pred['out']
 
             loss = loss_fn(y_pred, y)
-            epoch_loss += loss.itme()
+            epoch_loss += loss.item()
 
             epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision = metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision)
 

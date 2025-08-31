@@ -10,16 +10,13 @@ def preprocess(img):
     if image.ndim == 3 and image.shape[2] == 3:
         image = rgb2gray(image)
         
-    # First, contrast limited adaptive histogram equalisation (CLAHE)
     clahe_image = exposure.equalize_adapthist(image)
 
-    # invert image
     inv_clahe_image = util.invert(clahe_image)
 
     # White top-hat transform (large SE, exact size not specified)
     w_tophat_image = morphology.white_tophat(inv_clahe_image, morphology.disk(20))
-
-    # Original - top hat
+    
     orig_tophat = image - w_tophat_image
 
     # Non-negative thresholding, threshold not specified
@@ -27,9 +24,8 @@ def preprocess(img):
 
     # CLAHE
     clahe_thresh_image = exposure.equalize_adapthist(thresh_image)
-    preprocess_img = clahe_thresh_image
 
-    return (preprocess_img * 255).astype(np.uint8)
+    return (clahe_thresh_image * 255).astype(np.uint8)
 
 def preprocess_inplace(img_path):
     img = io.imread(img_path)

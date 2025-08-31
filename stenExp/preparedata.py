@@ -82,6 +82,7 @@ def load_annotations(dataset_dir):
 
 def annotation_to_mask(path_to_json, split):
     num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
+    masks = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
 
     with open(path_to_json, encoding="utf-8") as file:
         file_store = json.load(file)
@@ -89,7 +90,6 @@ def annotation_to_mask(path_to_json, split):
 
     name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
 
-    masks = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
     for ann in annotations:
         points = np.array([ann["segmentation"][0][::2], ann["segmentation"][0][1::2]], dtype=np.int32).T
         points = points.reshape((-1, 1, 2))
@@ -101,15 +101,14 @@ def annotation_to_mask(path_to_json, split):
 
 def annotation_to_box(path_to_json, split):
     num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
-
+    boxes = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
+    
     with open(path_to_json, encoding="utf-8") as file:
         file_store = json.load(file)
         annotations = file_store['annotations']
 
     name_cls= {img['id']: img['file_name'][:-4] for img in file_store['images']}
-    
 
-    boxes = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
     for ann in annotations:
         p = np.array(ann["bbox"], dtype=np.int32)
         points = np.array([[p[0], p[1]], [p[0]+p[2], p[1]], [p[0]+p[2],p[1]+p[3]], [p[0], p[1]+p[3]]], dtype=np.int32)
@@ -189,27 +188,25 @@ def prepare_data_for_yolo(path='arcade/stenosis/', path_new='stenExp/datasets/ar
                 preprocess_inplace(f'{dst}{filename}')
 
 def prepare_data_stenosis(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/', copy_data=False):
-    if copy_data: #copy data to new file path location, and store as png matrices rather than coordinates
+    if copy_data: #copy data to new file path location
         make_directories(path_new)
         
         for split in ['train', 'test', 'val']:
             image_paths = sorted(glob(os.path.join(path,split,'images', '*.png')))
             image_paths = sorted(image_paths, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
 
-            dst_img=path_new+f'{split}/images/'
+            img_dst=path_new+f'{split}/images/'
             json_src = path+f'{split}/annotations/{split}.json'
-            json_dst=path_new+f'{split}/annotations/'
+            ann_dst=path_new+f'{split}/annotations/'
             box_dst=path_new+f'{split}/boxes/'
             
             for src_img in image_paths:
-                print('source',src_img)
-                print('dst', dst_img)
-                copy_file(src_img, dst_img)
-            copy_file(json_src, json_dst)
+                copy_file(src_img, img_dst)
+            copy_file(json_src, ann_dst)
 
             for i, mask in enumerate(annotation_to_mask(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
                 mask=(mask* 255).astype(np.uint8)
-                cv2.imwrite(os.path.join(json_dst,f'{i+1}.png'),mask)
+                cv2.imwrite(os.path.join(ann_dst,f'{i+1}.png'),mask)
             
             for i, box in enumerate(annotation_to_box(os.path.join(path,split,f'annotations/{split}.json'), split=split)):
                 box=(box* 255).astype(np.uint8)
@@ -241,7 +238,6 @@ def load_data(path='stenExp/datasets/arcade/stenosis/', bbox=False):
     else:
         return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
 
-#https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
 class ARCADE_DATASET(Dataset):
     def __init__(self, images_path, masks_path, size, transform=None, bbox=False, boxes_path=None):
         super().__init__()

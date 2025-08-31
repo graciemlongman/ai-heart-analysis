@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # for thresh in pp_threshold:
 
     """ Vars """
-    model_choice = 'aunet3'
+    model_choice = 'aunet2'
     optim_choice = 'Adam'
     bbox=False
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     images='stenExp/datasets/arcade/stenosis/test/images/'
     masks='stenExp/datasets/arcade/stenosis/test/annotations/'
     
-    folder =f'{model_choice}_res/{optim_choice}'
+    folder =f'{model_choice}_redo/{optim_choice}'
     out_preds=f'stenExp/model_runs/{folder}/results/mask/'
     checkpoint_path = f"stenExp/model_runs/{folder}/checkpoint.pth"
 

@@ -44,10 +44,8 @@ class SegModel:
             image = cv2.resize(cv2.imread(ipath, cv2.IMREAD_COLOR),size)
             y_true=cv2.resize(cv2.imread(mpath, cv2.IMREAD_GRAYSCALE),size)
 
-            if result.masks is None:
-                y_pred = np.zeros(size, dtype=np.uint8)
-            else:
-                y_pred = np.zeros((512,512), dtype=np.uint8)
+            y_pred = np.zeros((512,512), dtype=np.uint8)
+            if result.masks is not None:
                 for m in result:
                     tmp = np.zeros((512,512), dtype=np.uint8)
                     for points in m.masks.xy:
@@ -55,7 +53,7 @@ class SegModel:
                         cv2.fillPoly(tmp, [pts], (1,))
                     y_pred |= tmp
 
-            y_post_pred = binary_remove_small_segments(cv2.resize(y_pred, (512,512)), 50)
+            y_post_pred = binary_remove_small_segments(y_pred, 50)
 
             metrics_score = calculate_metrics(y_true, y_pred, y_true_proc='evaluate', y_pred_proc='postprocessed', size=size)
             metrics = list(map(add, metrics, metrics_score))
@@ -86,3 +84,4 @@ if __name__=='__main__':
     
     save_path=f'stenExp/model_runs/{model_choice}/{name}/results'
     model.process_results(results, save_path=save_path)
+    

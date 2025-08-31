@@ -55,7 +55,6 @@ def write_yaml(dataset_new_path, denom):
         for idx, name in enumerate(class_names):
             file.write(f"  {idx}: '{name}'\n")
 
-
 def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
     
     file_store = load_annotations(dataset_dir)

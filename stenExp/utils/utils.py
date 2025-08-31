@@ -207,18 +207,18 @@ try:
     #from models.transunet.transunet import TransUNet
     from models.saumamba.vmunet import VMUNet
 
-    from models.aunet import AttU_Net
-    from models.aunet1 import AttU_Net1 #deformable
-    from models.aunet2 import AttU_Net2 #aspp
-    from models.aunet3 import AttU_Net3 #assp + bottleneck
-    from models.aunet4 import AttU_Net4 #bottleneck
+    from models.aunet_and_mods.aunet import AttU_Net
+    from models.aunet_and_mods.aunet1 import AttU_Net1 #deformable
+    from models.aunet_and_mods.aunet2 import AttU_Net2 #aspp
+    from models.aunet_and_mods.aunet3 import AttU_Net3 #residual
+    from models.aunet_and_mods.aunet4 import AttU_Net4 #bottleneck
 
-    from models.attUMambaEnc import AttUMambaEnc, InitWeights_He #aunet dec
-    from models.attUMambaBot import AttUMambaBot
-    from models.attUMambaEnc_2 import UMambaEnc_2 #umamba decoder
-    from models.attUMambaBot_2 import UMambaBot_2
-    from models.umambaBot import UMambaBot
-    from models.umambaEnc import UMambaEnc
+    from models.umamba_and_mods.attUMambaEnc import AttUMambaEnc, InitWeights_He #aunet dec
+    from models.umamba_and_mods.attUMambaBot import AttUMambaBot
+    from models.umamba_and_mods.attUMambaEnc_2 import UMambaEnc_2 #umamba decoder
+    from models.umamba_and_mods.attUMambaBot_2 import UMambaBot_2 
+    from models.umamba_and_mods.umambaBot import UMambaBot
+    from models.umamba_and_mods.umambaEnc import UMambaEnc
 
     from models.bbunet import BB_Unet
     from models.bb_aunet import attBB_UNet
