@@ -1,0 +1,4 @@
+Jaccard: 0.4227 - F1: 0.5627 - Recall: 0.6301 - Precision: 0.6120 - Acc: 0.9915 - F2: 0.5885 - HD: 3.4690 
+
+Jaccard: 0.4267 - F1: 0.5663 - Recall: 0.6694 - Precision: 0.5955 - Acc: 0.9912 - F2: 0.6095 - HD: 3.4746 
+
