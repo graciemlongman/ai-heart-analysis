@@ -6,3 +6,4 @@ Jaccard: 0.4400 - F1: 0.5803 - Recall: 0.6480 - Precision: 0.5993 - Acc: 0.9917 
 Mean FPS: 212.93059392195073 
 Mean SPF: 1.56545533074273e-05 
 
+To make sure my own implementation compared to the pytorch version before i added the mods
