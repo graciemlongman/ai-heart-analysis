@@ -7,6 +7,8 @@ import torch.nn.functional as F
 from torchvision.models.segmentation.deeplabv3 import DeepLabHead, DeepLabV3
 import numpy as np
 
+
+# https://github.com/Peachypie98/CBAM/blob/main/cbam.py
 class SAM(nn.Module):
     def __init__(self, bias=False):
         super(SAM, self).__init__()
@@ -53,7 +55,11 @@ class CBAM(nn.Module):
         output = self.cam(x)
         output = self.sam(output)
         return output + x
+    
+### end of source
 
+
+## TAKEN FROM https://github.com/DebeshJha/ResUNetplusplus-PyTorch-
 class Squeeze_Excitation(nn.Module):
     def __init__(self, channel, r=8):
         super().__init__()
@@ -73,6 +79,10 @@ class Squeeze_Excitation(nn.Module):
         x = inputs * x
         return x
 
+## end of source
+
+
+## written by me
 class CBAM_Block(Bottleneck):
     def __init__(self, inplanes, planes, stride=1, dilation=1, downsample=None):
         super().__init__(inplanes, planes, stride, downsample, dilation=dilation)
@@ -100,6 +110,8 @@ class CBAM_Block(Bottleneck):
 
         return x3
 
+
+## written by me
 class SE_block(Bottleneck): #SE-Pre from the paper
     def __init__(self, inplanes, planes, stride=1, dilation=1, downsample=None):
         super().__init__(inplanes, planes, stride, downsample, dilation=dilation)
@@ -130,6 +142,8 @@ class SE_block(Bottleneck): #SE-Pre from the paper
 
         return x3
 
+
+## written by me
 from torchvision.ops import DeformConv2d
 class DF_Block(Bottleneck):
     def __init__(self, inplanes, planes, stride=1, downsample=None, dilation=1):
@@ -158,6 +172,8 @@ class DF_Block(Bottleneck):
 
         return x3
     
+
+## written by me    
 class BB_block(Bottleneck):
     def __init__(self, inplanes, planes, stride=1, downsample=None, dilation=1):
         super().__init__(inplanes, planes, stride, downsample, dilation=dilation)
@@ -190,7 +206,9 @@ class BB_block(Bottleneck):
         x3=self.relu(x3)
 
         return x3
-    
+
+
+# https://github.com/a-martyn/resnet/blob/master/resnet.py
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=1, deformable=False, use_cbam_class = False):
         super(ResNet, self).__init__()
@@ -269,6 +287,7 @@ class ResNet(nn.Module):
         x = self.relu(x)
         x = self.maxpool(x)
 
+        # added by me
         if b != None:
             x = self._forward_layer(self.layer1, x, b)
             x = self._forward_layer(self.layer2, x, b)
@@ -286,6 +305,7 @@ class ResNet(nn.Module):
         return {'out':x}
 
 
+# written by me
 class ResNet101DeepLabV3(DeepLabV3):
     def __init__(self, backbone=ResNet(Bottleneck, [3,4,23,3]), classifier=DeepLabHead(2048, 1)):
         super().__init__(backbone, classifier)
@@ -302,6 +322,8 @@ class ResNet101DeepLabV3(DeepLabV3):
         x = nn.functional.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
         return x
     
+
+# written by me    
 def _load_weights(model, pretrained_model=None):
     pretrained_model = torchvision.models.segmentation.deeplabv3_resnet101(weights='DEFAULT', 
                                                 progress=True, aux_loss=None)

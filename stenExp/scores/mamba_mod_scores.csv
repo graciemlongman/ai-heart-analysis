@@ -1,0 +1,12 @@
+
+Model,Jaccard,F1,Recall,Precision,Acc,F2,HD,MFPS,MSPF
+nnU-MambaBot_final, 0.4877, 0.6288, 0.6282, 0.7106, 0.9931, 0.6192, 3.5080,None,None
+nnU-MambaBot_final, 0.4968, 0.6364, 0.6683, 0.6858, 0.9930, 0.6444, 3.5134,None,None
+nnU-attMambaBot_final, 0.4735, 0.6171, 0.6236, 0.7012, 0.9928, 0.6105, 3.4928,None,None
+nnU-attMambaBot_final, 0.4843, 0.6263, 0.6650, 0.6755, 0.9926, 0.6369, 3.5030,None,None
+nnU-attMambaBot1_final, 0.4909, 0.6309, 0.6255, 0.7207, 0.9931, 0.6185, 3.5231,None,None
+nnU-attMambaBot1_final, 0.5007, 0.6391, 0.6655, 0.6927, 0.9930, 0.6441, 3.5416,None,None
+LKM-UNet_final, 0.4816, 0.6212, 0.6187, 0.7129, 0.9928, 0.6102, 3.4945,None,None
+LKM-UNet_final, 0.4920, 0.6300, 0.6588, 0.6865, 0.9927, 0.6360, 3.4952,None,None
+LKMUNetBOT_final, 0.4562, 0.5976, 0.6046, 0.6880, 0.9924, 0.5911, 3.5094,None,None
+LKMUNetBOT_final, 0.4669, 0.6068, 0.6452, 0.6636, 0.9922, 0.6170, 3.5266,None,None
