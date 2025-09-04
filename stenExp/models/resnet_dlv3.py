@@ -207,8 +207,7 @@ class BB_block(Bottleneck):
 
         return x3
 
-
-# https://github.com/a-martyn/resnet/blob/master/resnet.py
+# modified from https://github.com/VainF/DeepLabV3Plus-Pytorch/blob/master/network/backbone/resnet.py
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=1, deformable=False, use_cbam_class = False):
         super(ResNet, self).__init__()
