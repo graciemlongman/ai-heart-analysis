@@ -34,6 +34,16 @@ Following this different modifications to various architectures were investigate
 
 Finally Bounding-Box informed models were investigated.
 
+# Use
+To train a model, enter the `run.py` file. In the hyperparaemter section, specify the model you would like to use, the opimiser, whether you are resuming training or using bounding boxes. From the command line simply use `python run.py`. Results will automatically be stored in the model_runs folder.
+
+To evaluate the model, again specify the model you have just trained in the `test.py` file, then simply `python test.py`. Results will automatically be stored in the model_runs folder.
+
+You can modify architectures - place the pytorch code in the models folder. You must add an import in the utils folder for the `ModelZoo` function to init the model class, which is how the `run.py` file takes the models.
+
+For the Mamba models, these are run on the nnUNet framework. See the nnUNet docs or the citations below for use. I placed the modified architectures in the nets folder and wrote a new trainer class for teh experiments I made. 
+
+(more detail in report if needed)
 
 # Citations
 - DeepLabV3ResNet101 architecture https://docs.pytorch.org/vision/main/models/generated/torchvision.models.segmentation.deeplabv3_resnet101.html

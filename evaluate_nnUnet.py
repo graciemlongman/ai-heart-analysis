@@ -7,6 +7,7 @@ import numpy as np
 import os
 from operator import add
 
+# written by me
 # script which converts the predicted images to png and then
 # calculates the metrics on the preds, storing them in the 
 # correct folder in model_runs 

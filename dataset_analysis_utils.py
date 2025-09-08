@@ -10,6 +10,7 @@ import pandas as pd
 
 # functions useful for the exploratory analysis notebooks
 
+# written by me
 def store_images(json_file, path):
     store={}
     for img in json_file["images"]:
@@ -25,6 +26,7 @@ def get_points(json_file):
         store[ann["image_id"], ann["category_id"]].append(points)
     return store
 
+# written by me
 def get_masks(json_file, task, split):
     num_imgs = 301 if split=='test' else 201 if split=='val' else 1001
     if task =='syntax':
@@ -44,6 +46,8 @@ def get_masks(json_file, task, split):
     return masks
 ### end of adaptation
 
+
+# written by me
 def plot_points(img_store, points_store, categories, name=False):
     plt.figure(figsize=(15,10))
     cat_colours = {category: plt.cm.hsv(i / 26) for i, category in enumerate(categories)}
@@ -66,6 +70,7 @@ def plot_points(img_store, points_store, categories, name=False):
     if name:
         plt.savefig(name)
 
+# written by me
 def plot_masks(filename, img_store, masks_store, task, name=False):
     plt.figure(figsize=(15, 10))
     for idx, ann in enumerate(filename["annotations"][:12]):
@@ -86,6 +91,7 @@ def plot_masks(filename, img_store, masks_store, task, name=False):
     if name:
         plt.savefig(name)
 
+# written by me
 def split_into_fg_bg(filename, img_store, masks):
     fimgs,bimgs=[],[]
     for ann in filename["annotations"]:
@@ -99,6 +105,7 @@ def split_into_fg_bg(filename, img_store, masks):
     bimgs = np.concatenate([bg.flatten() for bg in bimgs])
     return fimgs, bimgs
 
+# written by me
 def calc_intensity_properties(arr):
     max = np.max(arr)
     mean = np.mean(arr)
