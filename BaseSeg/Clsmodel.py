@@ -2,6 +2,8 @@ from ultralytics import YOLO
 import os
 from Preparedata import cls_prepare_data
 
+# written by me
+
 class ClsModel:
     def __init__(self, data_dir, model_save_dir):
         self.model = YOLO("yolov8x-cls.pt")

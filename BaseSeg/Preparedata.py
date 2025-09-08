@@ -6,6 +6,7 @@ from collections import defaultdict
 import sys 
 from Preprocess import preprocess_inplace
 
+# written by me
 def load_annotations(dataset_dir):
     if dataset_dir is None:
         raise ValueError("No Data")
@@ -18,10 +19,14 @@ def load_annotations(dataset_dir):
             file_store[i]=anns 
     return file_store
 
+
+# written by me
 def copy_image(src, dst):
     if os.path.exists(src):
         shutil.copy(src, dst)
 
+
+# written by me
 def classify_l_r(file_store):
     label_store = defaultdict(list)
     rca_ids = {1, 2, 3, 4, 20, 21, 22, 23}
@@ -39,6 +44,8 @@ def classify_l_r(file_store):
                 processed_ids.add((split, image_id))
     return label_store
 
+
+# written by me
 def write_yaml(dataset_new_path, denom):
     home_path = '/home/lunet/nc0051/PROJECT/ai-heart-analysis'
     
@@ -55,6 +62,8 @@ def write_yaml(dataset_new_path, denom):
         for idx, name in enumerate(class_names):
             file.write(f"  {idx}: '{name}'\n")
 
+
+# written by me
 def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
     
     file_store = load_annotations(dataset_dir)
@@ -118,6 +127,7 @@ def seg_prepare_data(dataset_dir='arcade/syntax/', preprocess=False):
 
         
 
+# written by me
 def cls_prepare_data(dataset_dir='arcade/syntax/', dataset_new='BaseSeg/datasets/syntax1', preprocess=False):
 
     file_store = load_annotations(dataset_dir)

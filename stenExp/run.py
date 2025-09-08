@@ -7,6 +7,8 @@ from utils.metrics import DiceBCELoss
 from preparedata import *
 from trainer import *
 
+# code adapted from https://github.com/DebeshJha/ResUNetplusplus-PyTorch-
+
 if __name__ == "__main__":
     """ Seeding """
     seeding(42)

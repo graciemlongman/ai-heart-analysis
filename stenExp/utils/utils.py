@@ -49,7 +49,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 ######
 
-#Adapted
+# adapted from ttps://github.com/DebeshJha/ResUNetplusplus-PyTorch-
 def print_and_save(file_path, data_str, print_=True):
     if print_:
         print(data_str)
@@ -58,11 +58,14 @@ def print_and_save(file_path, data_str, print_=True):
         file.write("\n")
 #####
 
+# written by me
 def file_exists_print_and_exit():
     print("Log file exists")
     print('Exiting process - check your directories :)')
     sys.exit()
 
+
+# # adapted from ttps://github.com/DebeshJha/ResUNetplusplus-PyTorch-
 def create_file(path):
     if os.path.exists(path):
         file_exists_print_and_exit()
@@ -129,6 +132,8 @@ def mean_score(metrics_score, num_imgs, print_=False):
     
     return [jaccard, f1, recall, precision, acc, f2, hd]
 
+# adapted from ttps://github.com/DebeshJha/ResUNetplusplus-PyTorch-
+# added post processing
 def metrics_on_preds(images, masks, preds, size, save_path, results_path, pp_threshold=50):
     for item in ["joint", "procd_mask", 'overlay']:
         if not os.path.exists(f"{save_path}/{item}"):
@@ -168,6 +173,7 @@ def metrics_on_preds(images, masks, preds, size, save_path, results_path, pp_thr
 
     save_test_results_to_file(results_path, metrics, post_metrics)
 
+# written by me
 def save_test_results_to_file(results_path, metrics, post_metrics, mean_time_taken=None, num_imgs=None):
     m_str = f"Jaccard: {metrics[0]:1.4f} - F1: {metrics[1]:1.4f} - Recall: {metrics[2]:1.4f} - Precision: {metrics[3]:1.4f} - Acc: {metrics[4]:1.4f} - F2: {metrics[5]:1.4f} - HD: {metrics[6]:1.4f} \n"
     pm_str = f"Jaccard: {post_metrics[0]:1.4f} - F1: {post_metrics[1]:1.4f} - Recall: {post_metrics[2]:1.4f} - Precision: {post_metrics[3]:1.4f} - Acc: {post_metrics[4]:1.4f} - F2: {post_metrics[5]:1.4f} - HD: {post_metrics[6]:1.4f} \n"
@@ -181,6 +187,7 @@ def save_test_results_to_file(results_path, metrics, post_metrics, mean_time_tak
         time_str = f"Mean FPS: {mean_fps} \nMean SPF: {mean_spf} \n"
         print_and_save(results_path, time_str)
 
+# written by me
 def plot_true_vs_preds_to_file(size, save_path, name, image, y_true, y_pred, y_post_pred):
     line = np.ones((size[0], 10, 3)) * 255
     cat_images = np.concatenate([image, line, y_true, line, y_pred, line, y_post_pred], axis=1)
@@ -191,7 +198,7 @@ def plot_true_vs_preds_to_file(size, save_path, name, image, y_true, y_pred, y_p
     overlaid_images = cv2.addWeighted(cat_raw_imgs, 0.5, cat_images, 0.5, 0)
     cv2.imwrite(f"{save_path}/overlay/{name}", overlaid_images)
 
-
+# written by me
 def OptZoo(choice, model, lr):
     if choice == 'Adam':
         return torch.optim.Adam(model.parameters(), lr=lr)
@@ -205,7 +212,6 @@ def OptZoo(choice, model, lr):
 try:
     from models.resunetplusplus import build_resunetplusplus
     #from models.transunet.transunet import TransUNet
-    from models.saumamba.vmunet import VMUNet
 
     from models.aunet_and_mods.aunet import AttU_Net
     from models.aunet_and_mods.aunet1 import AttU_Net1 #deformable
@@ -231,6 +237,7 @@ except Exception as e:
 from torch import nn
 import torchvision
 
+# written by me
 def ModelZoo(choice, partition=None):
     if choice == 'resunetplusplus':
         return build_resunetplusplus()
@@ -272,15 +279,6 @@ def ModelZoo(choice, partition=None):
                           patch_dim=16,
                           class_num=1)
         model.load_from(weights=np.load('stenExp/models/transunet/pretrained_weights/weights.pt'))
-        return model
-    elif choice == 'saumamba':
-        model = VMUNet(num_classes=1,
-                        input_channels=3,
-                        depths=[2,2,2,2],
-                        depths_decoder=[2,2,2,1],
-                        drop_path_rate=0.2,
-                        load_ckpt_path='stenExp/models/saumamba/pretrained_weights/vmamba_small_e238_ema.pth')
-        model.load_from()
         return model
     elif choice == 'attentionunet':
         return AttU_Net()
@@ -347,6 +345,7 @@ def ModelZoo(choice, partition=None):
     else:
         raise ValueError(f"Model choice '{choice}' is not supported.")
 
+# written by me
 def plot_training_curve(path_to_log_files, save_img_loc):
     train_loss, val_loss, epochs=[],[],[]
     

@@ -1,10 +1,9 @@
-
-### TAKEN FROM https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/train.py
-
 import numpy as np
 import torch
 from utils.utils import calculate_metrics
 import collections
+
+# code adapted from https://github.com/DebeshJha/ResUNetplusplus-PyTorch-
 
 def metrics(y, y_pred, epoch_loss, epoch_jac, epoch_f1, epoch_recall, epoch_precision):
     """ Calculate the metrics """

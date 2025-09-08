@@ -3,6 +3,8 @@ from skimage.color import rgb2gray
 import cv2 as cv
 import numpy as np 
 
+# written by me
+
 def preprocess(img):
 
     image = img.astype(np.float32) / 255.0 

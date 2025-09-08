@@ -2,6 +2,8 @@ from ultralytics import YOLO
 import os
 from Preparedata import seg_prepare_data
 
+#written by me
+
 class SegModel:
     def __init__(self, model_version, data_dir, model_save_dir):
         self.model=YOLO("yolov8x-seg.pt")

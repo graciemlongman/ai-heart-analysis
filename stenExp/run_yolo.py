@@ -5,6 +5,8 @@ from preparedata import *
 from utils.utils import *
 from operator import add
 
+# written by me
+
 class SegModel:
     def __init__(self, raw_data_dir, save_path):
         self.model=YOLO("yolov8x-seg.pt")

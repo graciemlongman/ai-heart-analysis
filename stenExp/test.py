@@ -10,7 +10,9 @@ from utils.utils import *
 from preparedata import load_data
 
 
-# https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/test.py
+# code adapted from https://github.com/DebeshJha/ResUNetplusplus-PyTorch-/blob/main/test.py
+
+
 def process_mask(y_pred):
     if isinstance(y_pred, torch.Tensor):
         y_pred = y_pred[0].cpu().numpy()

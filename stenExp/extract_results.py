@@ -3,6 +3,7 @@ from utils.utils import create_file, print_and_save
 
 # Script which extracts the outputted metrics from the relevent results.txt 
 # files generated after inference
+# all written by me
 
 # find . -type f -name "results.txt"
 

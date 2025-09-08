@@ -1,8 +1,8 @@
 
 ## TAKEN FROM https://github.com/LeeJunHyun/Image_Segmentation/blob/master/network.py
 
-# Add bounding box informed operations to the skip connection
-# Used AttUNet backbone, including attention gates
+# I added bounding box informed operations to the skip connection
+
 
 
 import torch

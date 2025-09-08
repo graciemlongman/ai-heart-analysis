@@ -14,11 +14,12 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.utils import shuffle
 from utils.utils import print_and_save
 
-
+# written by me
 def copy_file(src, dst):
     if os.path.exists(src):
         shutil.copy(src, dst)
 
+# written by me
 def write_yaml(path):
     home_path = '/home/lunet/nc0051/PROJECT/ai-heart-analysis'
     with open(f'{path}/data.yaml', 'w', encoding='utf-8') as file:
@@ -27,6 +28,7 @@ def write_yaml(path):
         file.write(f"nc: 1\n")
         file.write("names: ['stenosis']")
 
+# written by me
 def write_json(path):
     home_path = '/home/lunet/nc0051/PROJECT/ai-heart-analysis'
     data={ "channel_names": { 
@@ -44,6 +46,7 @@ def write_json(path):
     with open(f'{path}/dataset.json', 'w', encoding='utf-8') as file:
         json.dump(data, file)
 
+# written by me
 def make_directories(path_new, version='torch'):
     if version=='torch':
         if os.path.exists(path_new)==False:
@@ -68,6 +71,7 @@ def make_directories(path_new, version='torch'):
     else:
         raise ValueError(f"Dataset version '{version}' is not supported.")
 
+# written by me
 def load_annotations(dataset_dir):
     if dataset_dir is None:
         raise ValueError("No Data")
@@ -80,6 +84,7 @@ def load_annotations(dataset_dir):
             file_store[i]=anns 
     return file_store
 
+# written by me
 def annotation_to_mask(path_to_json, split):
     num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
     masks = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
@@ -99,6 +104,7 @@ def annotation_to_mask(path_to_json, split):
 
     return masks 
 
+# written by me
 def annotation_to_box(path_to_json, split):
     num_imgs = 300 if split=='test' else 200 if split=='val' else 1000
     boxes = np.zeros((num_imgs, 512, 512), dtype=np.uint8)
@@ -118,6 +124,7 @@ def annotation_to_box(path_to_json, split):
 
     return boxes 
 
+# written by me
 #use preprocessed dataset already
 def prepare_data_for_nnunet(path='stenExp/datasets/arcade/stenosis/', path_new='Dataset112_ArcadeXCA/'):
     make_directories(path_new, version='nnunet')
@@ -157,6 +164,7 @@ def prepare_data_for_nnunet(path='stenExp/datasets/arcade/stenosis/', path_new='
             nib.save(nib.Nifti1Image(mask,affine=np.eye(4)), f'{dst_msk}/arcade_{num}.nii.gz')
     print('Fin')
 
+# written by me
 def prepare_data_for_yolo(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/yolo_stenosis/', preprocess=False):
     file_store = load_annotations(path)
     make_directories(path_new, version='yolo')
@@ -187,6 +195,7 @@ def prepare_data_for_yolo(path='arcade/stenosis/', path_new='stenExp/datasets/ar
             if preprocess:
                 preprocess_inplace(f'{dst}{filename}')
 
+# written by me
 def prepare_data_stenosis(path='arcade/stenosis/', path_new='stenExp/datasets/arcade/stenosis/', copy_data=False):
     if copy_data: #copy data to new file path location
         make_directories(path_new)
@@ -238,6 +247,7 @@ def load_data(path='stenExp/datasets/arcade/stenosis/', bbox=False):
     else:
         return [(train_x, train_y), (valid_x, valid_y), (test_x, test_y)]
 
+# adapted from ttps://github.com/DebeshJha/ResUNetplusplus-PyTorch-
 class ARCADE_DATASET(Dataset):
     def __init__(self, images_path, masks_path, size, transform=None, bbox=False, boxes_path=None):
         super().__init__()
@@ -288,6 +298,7 @@ class ARCADE_DATASET(Dataset):
     def __len__(self):
         return self.n_samples
 
+# adapted from ttps://github.com/DebeshJha/ResUNetplusplus-PyTorch-
 def data_loader(train_log_path, bbox, size, transform, batch_size):
     if bbox:
         print('Including bbox')
@@ -323,6 +334,7 @@ def data_loader(train_log_path, bbox, size, transform, batch_size):
 
     return train_loader, valid_loader
 
+# written by me
 def check_labels(train_loader, valid_loader, zipped_test):
     f='DEBUG_val'
     os.makedirs(f, exist_ok=True)
@@ -362,6 +374,7 @@ def check_labels(train_loader, valid_loader, zipped_test):
         if i==20:
             break
 
+# written by me
 def check_boxes(train_loader, valid_loader):
     f='DEBUG_val'
     os.makedirs(f, exist_ok=True)
